@@ -32,8 +32,25 @@ def parseData(packet):
         
     return None if dataD is None else {**header, **dataD}
 
+# Ver https://docs.python.org/3/library/struct.html para más detalles
 def protUnpack(protocol:int, data):
-    protocol_unpack = ["<B", "<Bl", "<BlBfBf"]
+    protocol_unpack = ["<Bi", "<BiBIBf","<BiBIBff","<BiBIBffffffff", "<BiBIBf8000s8000s8000s", "<B"]
+    """
+    < :     little endian
+    B :     unsigned char
+    i :     int
+    I :     unsigned int
+    f :     float
+    8000s:  char[8000]
+    
+    protocolo 0:    "<Bi"
+    protocolo 1:    "<BiBIBf"
+    protocolo 2:    "<BiBIBff"
+    protocolo 3:    "<BiBIBffffffff"
+    protocolo 4:    "<BiBIBf8000s8000s8000s"
+    protocolo_req:  "<B"
+    
+    """
     return unpack(protocol_unpack[protocol], data)
 
 def headerDict(data):
@@ -50,10 +67,13 @@ def dataDict(protocol:int, data):
             unp = protUnpack(protocol, data)
             return {key:val for (key,val) in zip(keys, unp)}
         return p
-    p0 = ["OK"]
-    p1 = ["Batt_level", "Timestamp"]
-    p2 = ["Batt_level", "Timestamp", "Temp", "Pres", "Hum", "Co"]
-    p = [p0, p1, p2]
+    p0 = ["Batt_level", "Timestamp"]
+    p1 = ["Batt_level", "Timestamp", "Temp", "Pres", "Hum", "Co"]
+    p2 = ["Batt_level", "Timestamp", "Temp", "Pres", "Hum", "Co", "RMS"]
+    p3 = ["Batt_level", "Timestamp", "Temp", "Pres", "Hum", "Co", "RMS", "AmpX", "FreqX", "AmpY", "FreqY", "AmpZ", "FreqZ"]
+    p4 = ["Batt_level", "Timestamp", "Temp", "Pres", "Hum", "Co", "AccX", "AccY", "AccZ"]
+    p_req = ["OK"]
+    p = [p0, p1, p2, p3, p4, p_req]
 
     try:
         return protFunc(protocol, p[protocol])(data)

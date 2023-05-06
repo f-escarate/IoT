@@ -9,7 +9,10 @@
 #include "esp_event.h"
 
 
-extern void tcp_client(void);
+extern void tcp_client(char* pkg);
+extern char* tcp_client_recv(void);
+extern void udp_client_task(void *pvParameters);
+extern char* mensaje (char protocol, char transportLayer);
 
 void app_main(void)
 {
@@ -23,5 +26,29 @@ void app_main(void)
      */
     ESP_ERROR_CHECK(example_connect());
 
-    tcp_client();
+
+    // Creating the pkg based on the protocol
+    char* pkg = mensaje(5, 0);
+    tcp_client(pkg);
+
+
+    // Initial connection
+    char* config = tcp_client_recv();
+    char ID_protocol = config[0];
+    char Transport_Layer = config[1];
+
+    // Creating the pkg based on the protocol
+    pkg = mensaje(ID_protocol, Transport_Layer);
+
+    // Selecting TCP=0 or UDP=1 in order to send the message
+    if (Transport_Layer == 0) {
+        tcp_client(pkg);
+    }
+    else if (Transport_Layer == 1) {
+        xTaskCreate(udp_client_task, "udp_client", 4096, pkg, 5, NULL);
+    }
+
+    // 
+
+
 }

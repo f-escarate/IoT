@@ -25,7 +25,6 @@
 #define PORT CONFIG_EXAMPLE_PORT
 
 static const char *TAG = "example";
-static const char *payload = "Message from ESP32 ";
 
 #if defined(CONFIG_IDF_TARGET_LINUX)
 // Checks for Global address, Unique Unicast(RFC4193) and link-local address.
@@ -159,7 +158,7 @@ static int get_src_iface(char *interface)
 #endif    // #if defined(CONFIG_IDF_TARGET_LINUX)
 
 
-void tcp_client(void)
+void tcp_client(char *pkg)
 {
     char rx_buffer[128];
     char host_ip[] = HOST_IP_ADDR;
@@ -226,7 +225,7 @@ void tcp_client(void)
         ESP_LOGI(TAG, "Successfully connected");
 
         while (1) {
-            int err = send(sock, payload, strlen(payload), 0);
+            int err = send(sock, pkg, strlen(pkg), 0);
             if (err < 0) {
                 ESP_LOGE(TAG, "Error occurred during sending: errno %d", errno);
                 break;

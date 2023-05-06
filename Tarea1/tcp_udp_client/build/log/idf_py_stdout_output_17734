@@ -28,7 +28,7 @@ Loading defaults file /home/felipe/Desktop/Tareas/IoT/Tarea1/tcp_udp_client/sdkc
 -- Found Python3: /home/felipe/.espressif/python_env/idf5.1_py3.10_env/bin/python (found version "3.10.6") found components: Interpreter 
 -- Performing Test C_COMPILER_SUPPORTS_WFORMAT_SIGNEDNESS
 -- Performing Test C_COMPILER_SUPPORTS_WFORMAT_SIGNEDNESS - Success
--- App "tcp_client" version: d8fb32f-dirty
+-- App "tcp_client" version: e86da3c-dirty
 -- Adding linker script /home/felipe/Desktop/Tareas/IoT/Tarea1/tcp_udp_client/build/esp-idf/esp_system/ld/memory.ld
 -- Adding linker script /home/felipe/esp/esp-idf/components/esp_system/ld/esp32/sections.ld.in
 -- Adding linker script /home/felipe/esp/esp-idf/components/esp_rom/esp32/ld/esp32.rom.ld

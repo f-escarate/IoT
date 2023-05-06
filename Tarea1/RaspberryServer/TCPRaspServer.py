@@ -1,26 +1,24 @@
 import socket
+from funs import *
 
 # "192.168.5.177"  # Standard loopback interface address (localhost)
-HOST = "192.168.4.1"#"localhost"
-PORT = 5000  # Port to listen on (non-privileged ports are > 1023)
+#HOST = "192.168.4.1"
+HOST = "192.168.1.154"
+PORT = 5001  # Port to listen on (non-privileged ports are > 1023)
 
 s = socket.socket(socket.AF_INET, #internet
                   socket.SOCK_STREAM) #TCP
 s.bind((HOST, PORT))
 s.listen(5)
-print(f"Listening on {HOST}:{PORT}")
-while True:
-    conn, addr = s.accept()
-    print(f'Conectado por alguien ({addr[0]}) desde el puerto {addr[1]}')
-    while True:
-        try:
-            data = conn.recv(1024)
-            if data == b'':
-                break
-        except ConnectionResetError:
-            break
-        print(f"Recibido {data}")
-        conn.send(data)
 
-    conn.close()
-    print('Desconectado')
+
+print(f"Listening on {HOST}:{PORT}")
+
+
+protocol, transport_layer = select_options()
+
+req_bytes = bytearray()
+req_bytes.append(protocol)
+req_bytes.append(transport_layer)
+
+connection(s, req_bytes)

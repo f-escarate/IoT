@@ -36,11 +36,11 @@
 #define PORT CONFIG_EXAMPLE_PORT
 
 static const char *TAG = "example";
-static const char *payload = "Message from ESP32 ";
 
 
-static void udp_client_task(void *pvParameters)
+void udp_client_task(void *pvParameters)
 {
+    char *pkg = (char*) pvParameters;
     char rx_buffer[128];
     char host_ip[] = HOST_IP_ADDR;
     int addr_family = 0;
@@ -84,7 +84,7 @@ static void udp_client_task(void *pvParameters)
 
         while (1) {
 
-            int err = sendto(sock, payload, strlen(payload), 0, (struct sockaddr *)&dest_addr, sizeof(dest_addr));
+            int err = sendto(sock, pkg, strlen(pkg), 0, (struct sockaddr *)&dest_addr, sizeof(dest_addr));
             if (err < 0) {
                 ESP_LOGE(TAG, "Error occurred during sending: errno %d", errno);
                 break;
@@ -123,17 +123,17 @@ static void udp_client_task(void *pvParameters)
     vTaskDelete(NULL);
 }
 
-void app_main(void)
+/* void app_main(void)
 {
     ESP_ERROR_CHECK(nvs_flash_init());
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
 
-    /* This helper function configures Wi-Fi or Ethernet, as selected in menuconfig.
-     * Read "Establishing Wi-Fi or Ethernet Connection" section in
-     * examples/protocols/README.md for more information about this function.
-     */
+    // This helper function configures Wi-Fi or Ethernet, as selected in menuconfig.
+    // Read "Establishing Wi-Fi or Ethernet Connection" section in
+    // examples/protocols/README.md for more information about this function.
+     
     ESP_ERROR_CHECK(example_connect());
 
     xTaskCreate(udp_client_task, "udp_client", 4096, NULL, 5, NULL);
-}
+} */

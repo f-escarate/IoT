@@ -16,7 +16,6 @@ int TCP_send_frag(int sock, char status, char protocolo)
 
     for (int i = 0; i < payloadLen; i += PACK_LEN)
     {
-
         // Generamos el siguiente trozo
         int size = fmin(PACK_LEN, payloadLen - i);
         char *pack = malloc(size);
