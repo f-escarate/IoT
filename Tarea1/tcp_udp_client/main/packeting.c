@@ -16,12 +16,11 @@ static const char end_len = 5;
 char* header(char protocol, char transportLayer){
 	char* head = malloc(12);
 
-    char ID[2] = {'D', '1'};
-    memcpy(head, ID, 2);
+    unsigned short ID = 2023;
+    memcpy(head, &ID, 2);
 
 	uint8_t* MACaddrs = malloc(6);
-	//172,103,178,60,18,148
-	esp_efuse_mac_get_default(MACaddrs);
+	esp_efuse_mac_get_default(MACaddrs);	//172,103,178,60,18,148
 	memcpy((void*) &(head[2]), (void*) MACaddrs, 6);
 	
 	char prtl[2] = {protocol, transportLayer};

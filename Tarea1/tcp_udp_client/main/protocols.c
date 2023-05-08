@@ -1,6 +1,7 @@
 #include <sensors.c>
 #include <stdlib.h>
 #include <string.h>
+#include "esp_log.h"
 
 
 unsigned short lengmsg[6] = {6, 16, 20, 44, 24016, 2};

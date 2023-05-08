@@ -7,12 +7,16 @@
 #include "esp_netif.h"
 #include "protocol_examples_common.h"
 #include "esp_event.h"
+#include "esp_log.h"
 
 
 extern void tcp_client(char* pkg);
 extern char* tcp_client_recv(void);
 extern void udp_client_task(void *pvParameters);
 extern char* mensaje (char protocol, char transportLayer);
+
+
+static const char *TAG3 = "main";
 
 void app_main(void)
 {
@@ -27,18 +31,15 @@ void app_main(void)
     ESP_ERROR_CHECK(example_connect());
 
 
-    // Creating the pkg based on the protocol
-    char* pkg = mensaje(5, 0);
-    tcp_client(pkg);
-
-
     // Initial connection
     char* config = tcp_client_recv();
-    char ID_protocol = config[0];
-    char Transport_Layer = config[1];
+    char ID_protocol = config[1];
+    char Transport_Layer = config[2];
+    ESP_LOGE(TAG3, "protocol %u transportlayer %u:", ID_protocol, Transport_Layer);
+
 
     // Creating the pkg based on the protocol
-    pkg = mensaje(ID_protocol, Transport_Layer);
+    char* pkg = mensaje(ID_protocol, Transport_Layer);
 
     // Selecting TCP=0 or UDP=1 in order to send the message
     if (Transport_Layer == 0) {

@@ -6,9 +6,9 @@ def TCP_frag_recv(conn):
         try:
             conn.settimeout(5)
             doc += conn.recv(1024)
-            print(len(doc), doc)
-            if end_of_packet in doc:
-                idx = doc.find(end_of_packet)
+            idx = doc.find(end_of_packet)
+            print(len(doc), doc, idx)
+            if idx != -1:
                 doc = doc[:idx]
                 break
         except TimeoutError:
@@ -20,11 +20,9 @@ def TCP_frag_recv(conn):
         conn.send(b'\1')
 
     # Replacing the '\n' that we put on the ESP-32 for '\0'
-    for i in range(len(doc)):
-        if doc[i] == b'\n':
-            doc[i] = b'\0'
-
-    return doc
+    res = doc.replace(b'\n', b'\0')
+    print("doooc", res)
+    return res
 
 def UDP_frag_recv(s):
     doc = b""

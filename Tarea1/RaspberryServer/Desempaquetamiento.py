@@ -23,12 +23,12 @@ def response(change:bool=False, status:int=255, protocol:int=255):
     return pack("<BBBB", OK, CHANGE, status, protocol)
 
 def parseData(packet):
-    header = packet[:10]
-    data = packet[10:]
+    header = packet[:12]
+    data = packet[12:]
     header = headerDict(header)
     dataD = dataDict(header["protocol"], data)
-    if dataD is not None:
-        dataSave(header, dataD)
+    #if dataD is not None:
+        #dataSave(header, dataD)
         
     return None if dataD is None else {**header, **dataD}
 
@@ -54,9 +54,9 @@ def protUnpack(protocol:int, data):
     return unpack(protocol_unpack[protocol], data)
 
 def headerDict(data):
-    M1, M2, M3, M4, M5, M6, protocol, status, leng_msg = unpack("<6B2BH", data)
+    ID_device, M1, M2, M3, M4, M5, M6, protocol, status, leng_msg = unpack("<H6B2BH", data)
     MAC = ".".join([hex(x)[2:] for x in [M1, M2, M3, M4, M5, M6]])
-    return {"MAC":MAC, "protocol":protocol, "status":status, "length":leng_msg}
+    return {"ID_device": ID_device, "MAC":MAC, "protocol":protocol, "status":status, "length":leng_msg}
 
 def dataDict(protocol:int, data):
     if protocol not in [0, 1, 2, 3, 4, 5]:
