@@ -49,7 +49,7 @@ float** accelerometer_sensor(){
     return result;
 }
 
-char* THPC_sensor(){
+char* TPHC_sensor(){
     char *result = malloc(10*sizeof(char));         //10 bytes
 
     char temp = (rand() % 25) + 5;                  //1 byte
