@@ -23,7 +23,7 @@ char* dataprotocol0(){
     char* msg = malloc(dataLength(0));
 
     float batt = batt_sensor();
-    long t = 0;
+    int t = get_time();
 
     msg[0] = batt;
     memcpy((void*) &(msg[1]), (void*) &t, 4);
@@ -37,23 +37,52 @@ char* dataprotocol1(){
     
     char val = 1;               // 1 byte <- hay que ver que es esto
     char batt = batt_sensor();  // 1 byte
-    int t = 0;                  // 4 bytes
-    char* thpc = THPC_sensor(); // 10 bytes
+    int t = get_time();               // 4 bytes
+    char* tphc = TPHC_sensor(); // 10 bytes
     
     msg[0] = val;
     msg[1] = batt;
     memcpy((void*) &(msg[2]), (void*) &t, 4);
-    memcpy((void*) &(msg[6]), (void*) thpc, 10);
+    memcpy((void*) &(msg[6]), (void*) tphc, 10);
     return msg;
 }
 
 char* dataprotocol2(){
     char* msg = malloc(dataLength(2));
+    
+    char val = 1;               // 1 byte <- hay que ver que es esto
+    char batt = batt_sensor();  // 1 byte
+    int t = get_time();;        // 4 bytes
+    char* tphc = TPHC_sensor(); // 10 bytes
+    
+    msg[0] = val;
+    msg[1] = batt;
+
+    memcpy((void*) &(msg[2]), (void*) &t, 4);
+    memcpy((void*) &(msg[6]), (void*) tphc, 10);
+    float rms = accelerometer_kpi()[0];
+    memcpy((void*) &(msg[16]), (void*) &rms, 4);
+
+
     return msg;
 }
 
 char* dataprotocol3(){
-    char* msg = malloc(dataLength(3));
+    char* msg = malloc(dataLength(2));
+    
+    char val = 1;               // 1 byte <- hay que ver que es esto
+    char batt = batt_sensor();  // 1 byte
+    int t = get_time();;        // 4 bytes
+    char* tphc = TPHC_sensor(); // 10 bytes
+    
+    msg[0] = val;
+    msg[1] = batt;
+
+    memcpy((void*) &(msg[2]), (void*) &t, 4);
+    memcpy((void*) &(msg[6]), (void*) tphc, 10);
+    float* akpi = accelerometer_kpi();
+    memcpy((void*) &(msg[16]), (void*) akpi, 28);
+
     return msg;
 }
 
@@ -62,14 +91,14 @@ char* dataprotocol4(){
 
     char val = 1;                       // 1 byte <- hay que ver que es esto
     char batt = batt_sensor();          // 1 byte
-    int t = 0;                          // 4 bytes
-    char* thpc = THPC_sensor();         // 10 bytes
+    int t = get_time();;                // 4 bytes
+    char* tphc = TPHC_sensor();         // 10 bytes
     float** acc = accelerometer_sensor();// 24000 bytes
     
     msg[0] = val;
     msg[1] = batt;
     memcpy((void*) &(msg[2]), (void*) &t, 4);
-    memcpy((void*) &(msg[6]), (void*) thpc, 10);
+    memcpy((void*) &(msg[6]), (void*) tphc, 10);
     memcpy((void*) &(msg[16]), (void*) *acc, 24000);
 
 

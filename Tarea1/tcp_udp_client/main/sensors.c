@@ -4,6 +4,7 @@
 #include "esp_system.h"
 #include "esp_mac.h"
 #include "esp_log.h"
+#include <time.h>
 
 #define PI 3.14159265358979323846
 
@@ -91,4 +92,12 @@ float* accelerometer_kpi(){
 
     return result;
 
+}
+
+int get_time() {
+    time_t s;  // Seconds
+    struct timespec spec;
+    clock_gettime(CLOCK_REALTIME, &spec);
+    s  = spec.tv_sec;
+    return (int) s;
 }
