@@ -80,7 +80,7 @@ char* tcp_client(char *pkg)
                 rx_buffer[len] = 0; // Null-terminate whatever we received and treat like a string
                 ESP_LOGI(TAG, "Received %d bytes from %s:", len, host_ip);
                 ESP_LOGI(TAG, "%s", rx_buffer);
-                if(rx_buffer[0] == 'c'){
+                if(rx_buffer[0] == 1){
                     char* ret = malloc(4*sizeof(char));
                     memcpy(ret, rx_buffer, 4*sizeof(char));
                     return ret;

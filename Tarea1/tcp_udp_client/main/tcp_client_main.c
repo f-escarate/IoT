@@ -33,9 +33,9 @@ void app_main(void)
 
     // Initial connection
     char* config = tcp_client_recv();
-    char ID_protocol = config[1];
-    char Transport_Layer = config[2];
-    ESP_LOGE(TAG3, "protocol %u transportlayer %u:", ID_protocol, Transport_Layer);
+    char ID_protocol = config[2];
+    char Transport_Layer = config[3];
+    ESP_LOGE(TAG3, "%u,%u,%u,%u,protocol %u transportlayer %u:",config[0],config[1],config[2],config[3], ID_protocol, Transport_Layer);
 
 
     // Creating the pkg based on the protocol

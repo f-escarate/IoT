@@ -1,7 +1,7 @@
 import keyboard
 import socket
 from juntarFragm import TCP_frag_recv, UDP_frag_recv
-from Desempaquetamiento import parseData
+from Desempaquetamiento import parseData, response
 
 def select_options():
     print("Select the protocol (0, 1, 2, 3, 4) ")
@@ -73,17 +73,15 @@ def connection(host, port):
             except:
                 conn.close()
                 break
-            print(f"Recibido {data}")
-            send_bytes = bytearray()
-            send_bytes.append(99)          # 'c': is for tell the client, that we received the pkg
-
             parsedData = parseData(data)
-            print(parsedData)
+            print(f"Recibido {parsedData}")
                 
             # If the client, requested a protocol and transport_layer, we send it
+            change = False
             if parsedData["protocol"] == 5:
-                send_bytes.append(protocol)
-                send_bytes.append(transport_layer)
+                change=True
+            
+            send_bytes = response(change=change, status=transport_layer, protocol=protocol)
             conn.send(send_bytes)
             
             # If the next connection is with UDP, we try to connect using UDP socket

@@ -31,8 +31,12 @@ def parseData(packet):
     print("headerDicc_ ", header)
     dataD = dataDict(header["protocol"], data)
     print("dataD: ", dataD)
-    #if dataD is not None:
-        #dataSave(header, dataD)
+    
+    if dataD is not None:
+        if header["protocol"] == 5:
+            saveLog(header, data)
+        else:
+            dataSave(header, dataD)
         
     return None if dataD is None else {**header, **dataD}
 

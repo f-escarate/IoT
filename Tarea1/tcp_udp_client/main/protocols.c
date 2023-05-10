@@ -39,7 +39,7 @@ char* dataprotocol1(){
     
     char val = 1;               // 1 byte <- hay que ver que es esto
     char batt = batt_sensor();  // 1 byte
-    int t = 232;         // 4 bytes
+    int t = get_time();         // 4 bytes
     char* tphc = TPHC_sensor(); // 10 bytes
 
     ESP_LOGI(TAG8, "time: %d", t);
@@ -56,7 +56,7 @@ char* dataprotocol2(){
     
     char val = 1;                       // 1 byte <- hay que ver que es esto
     char batt = batt_sensor();          // 1 byte
-    int t = get_time();;                // 4 bytes
+    int t = get_time();                 // 4 bytes
     char* tphc = TPHC_sensor();         // 10 bytes
     float rms = accelerometer_kpi()[0]; // 4 bytes
     

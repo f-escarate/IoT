@@ -95,9 +95,7 @@ float* accelerometer_kpi(){
 }
 
 int get_time() {
-    time_t s;  // Seconds
-    struct timespec spec;
-    clock_gettime(CLOCK_REALTIME, &spec);
-    s  = spec.tv_sec;
-    return (int) s;
+    int ts = esp_log_timestamp();
+    ESP_LOGI("sensors", "time: %d", ts);
+    return ts;
 }
