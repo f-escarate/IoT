@@ -30,7 +30,7 @@ char* header(char protocol, char transportLayer){
 
 	memcpy((void*) &(head[10]), (void*) &dataLen, 2);
 	free(MACaddrs);
-	ESP_LOGE(TAG2, "head: %u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u", head[0], head[1], head[2],head[3], head[4], head[5],
+	ESP_LOGI(TAG2, "head: %u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u", head[0], head[1], head[2],head[3], head[4], head[5],
 	head[6], head[7], head[8],head[9], head[10], head[11]);
 
 	return head;
@@ -78,10 +78,10 @@ char* mensaje (char protocol, char transportLayer){
 			mnsj[i]='\n';
 
 
-	ESP_LOGE(TAG2, "HEADER: %s", hdr);
-	ESP_LOGE(TAG2, "Data: %s", data);
-	ESP_LOGE(TAG2, "eom: %s", end_of_pkg);
-	ESP_LOGE(TAG2, "paquete: %s", mnsj);
+	ESP_LOGI(TAG2, "HEADER: %s", hdr);
+	ESP_LOGI(TAG2, "Data: %s", data);
+	ESP_LOGI(TAG2, "eom: %s", end_of_pkg);
+	ESP_LOGI(TAG2, "paquete: %s", mnsj);
 	free(hdr);
 	free(data);
 	return mnsj;

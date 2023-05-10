@@ -3,18 +3,19 @@
 #include <string.h>
 #include "esp_log.h"
 
+static const char *TAG8 = "PRotocols";
 
 unsigned short lengmsg[6] = {6, 16, 20, 44, 24016, 2};
 // Entrega los posibles largos de cada protocolo
 unsigned short dataLength(char protocol){
-    return lengmsg[ (unsigned int) protocol]-1;
+    return lengmsg[ (unsigned int) protocol];
 }
 
 // Arma un paquete para el protocolo de inicio, que busca solo respuesta
 char* data_request(){
     char* msg = malloc(2);
     msg[0] = 'g';
-    msg[1] = '\0';
+    msg[1] = 'a';
     return msg;
 }
 
@@ -22,12 +23,13 @@ char* data_request(){
 char* dataprotocol0(){
     char* msg = malloc(dataLength(0));
 
+    char val = 1;
     float batt = batt_sensor();
     int t = get_time();
 
-    msg[0] = batt;
-    memcpy((void*) &(msg[1]), (void*) &t, 4);
-    msg[dataLength(0)-1] = '\0';
+    msg[0] = val;
+    msg[1] = batt;
+    memcpy((void*) &(msg[2]), (void*) &t, 4);
     return msg;
 }
 
@@ -37,8 +39,10 @@ char* dataprotocol1(){
     
     char val = 1;               // 1 byte <- hay que ver que es esto
     char batt = batt_sensor();  // 1 byte
-    int t = get_time();               // 4 bytes
+    int t = 232;         // 4 bytes
     char* tphc = TPHC_sensor(); // 10 bytes
+
+    ESP_LOGI(TAG8, "time: %d", t);
     
     msg[0] = val;
     msg[1] = batt;
@@ -50,17 +54,17 @@ char* dataprotocol1(){
 char* dataprotocol2(){
     char* msg = malloc(dataLength(2));
     
-    char val = 1;               // 1 byte <- hay que ver que es esto
-    char batt = batt_sensor();  // 1 byte
-    int t = get_time();;        // 4 bytes
-    char* tphc = TPHC_sensor(); // 10 bytes
+    char val = 1;                       // 1 byte <- hay que ver que es esto
+    char batt = batt_sensor();          // 1 byte
+    int t = get_time();;                // 4 bytes
+    char* tphc = TPHC_sensor();         // 10 bytes
+    float rms = accelerometer_kpi()[0]; // 4 bytes
     
     msg[0] = val;
     msg[1] = batt;
 
     memcpy((void*) &(msg[2]), (void*) &t, 4);
     memcpy((void*) &(msg[6]), (void*) tphc, 10);
-    float rms = accelerometer_kpi()[0];
     memcpy((void*) &(msg[16]), (void*) &rms, 4);
 
 
@@ -70,17 +74,17 @@ char* dataprotocol2(){
 char* dataprotocol3(){
     char* msg = malloc(dataLength(2));
     
-    char val = 1;               // 1 byte <- hay que ver que es esto
-    char batt = batt_sensor();  // 1 byte
-    int t = get_time();;        // 4 bytes
-    char* tphc = TPHC_sensor(); // 10 bytes
+    char val = 1;                       // 1 byte <- hay que ver que es esto
+    char batt = batt_sensor();          // 1 byte
+    int t = get_time();;                // 4 bytes
+    char* tphc = TPHC_sensor();         // 10 bytes
+    float* akpi = accelerometer_kpi();  // 28 bytes
     
     msg[0] = val;
     msg[1] = batt;
 
     memcpy((void*) &(msg[2]), (void*) &t, 4);
     memcpy((void*) &(msg[6]), (void*) tphc, 10);
-    float* akpi = accelerometer_kpi();
     memcpy((void*) &(msg[16]), (void*) akpi, 28);
 
     return msg;
@@ -89,11 +93,11 @@ char* dataprotocol3(){
 char* dataprotocol4(){
     char* msg = malloc(dataLength(4));
 
-    char val = 1;                       // 1 byte <- hay que ver que es esto
-    char batt = batt_sensor();          // 1 byte
-    int t = get_time();;                // 4 bytes
-    char* tphc = TPHC_sensor();         // 10 bytes
-    float** acc = accelerometer_sensor();// 24000 bytes
+    char val = 1;                           // 1 byte <- hay que ver que es esto
+    char batt = batt_sensor();              // 1 byte
+    int t = get_time();;                    // 4 bytes
+    char* tphc = TPHC_sensor();             // 10 bytes
+    float** acc = accelerometer_sensor();   // 24000 bytes
     
     msg[0] = val;
     msg[1] = batt;

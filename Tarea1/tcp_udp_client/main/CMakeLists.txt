@@ -8,6 +8,6 @@ else()
     set(tcp_client_ip tcp_client_v6.c)
 endif()
 
-idf_component_register(SRCS "tcp_client_main.c" "${tcp_client_ip}" "udp_client.c" "fragments.c" "sensors.c" "packeting.c" "protocols.c"
+idf_component_register(SRCS "tcp_client_v4.c" "tcp_client_main.c" "${tcp_client_ip}" "udp_client.c" "fragments.c" "sensors.c" "packeting.c" "protocols.c"
                                 INCLUDE_DIRS "."
                                 REQUIRES ${requires})

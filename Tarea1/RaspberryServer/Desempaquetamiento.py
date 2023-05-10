@@ -24,9 +24,13 @@ def response(change:bool=False, status:int=255, protocol:int=255):
 
 def parseData(packet):
     header = packet[:12]
+    print("header_ ", header)
     data = packet[12:]
+    print("data: ", data)
     header = headerDict(header)
+    print("headerDicc_ ", header)
     dataD = dataDict(header["protocol"], data)
+    print("dataD: ", dataD)
     #if dataD is not None:
         #dataSave(header, dataD)
         
@@ -34,7 +38,7 @@ def parseData(packet):
 
 # Ver https://docs.python.org/3/library/struct.html para más detalles
 def protUnpack(protocol:int, data):
-    protocol_unpack = ["<Bi", "<BiBIBf","<BiBIBff","<BiBIBffffffff", "<BiBIBf8000s8000s8000s", "<B"]
+    protocol_unpack = ["<BBi", "<BBiBIBf","<BBiBIBff","<BBiBIBffffffff", "<BBiBIBf8000s8000s8000s", "<BB"]
     """
     < :     little endian
     B :     unsigned char
@@ -43,12 +47,12 @@ def protUnpack(protocol:int, data):
     f :     float
     8000s:  char[8000]
     
-    protocolo 0:    "<Bi"
-    protocolo 1:    "<BiBIBf"
-    protocolo 2:    "<BiBIBff"
-    protocolo 3:    "<BiBIBffffffff"
-    protocolo 4:    "<BiBIBf8000s8000s8000s"
-    protocolo_req:  "<B"
+    protocolo 0:    "<BBi"
+    protocolo 1:    "<BBiBIBf"
+    protocolo 2:    "<BBiBIBff"
+    protocolo 3:    "<BBiBIBffffffff"
+    protocolo 4:    "<BBiBIBf8000s8000s8000s"
+    protocolo_req:  "<BB"
     
     """
     return unpack(protocol_unpack[protocol], data)
@@ -67,12 +71,12 @@ def dataDict(protocol:int, data):
             unp = protUnpack(protocol, data)
             return {key:val for (key,val) in zip(keys, unp)}
         return p
-    p0 = ["Batt_level", "Timestamp"]
-    p1 = ["Batt_level", "Timestamp", "Temp", "Pres", "Hum", "Co"]
-    p2 = ["Batt_level", "Timestamp", "Temp", "Pres", "Hum", "Co", "RMS"]
-    p3 = ["Batt_level", "Timestamp", "Temp", "Pres", "Hum", "Co", "RMS", "AmpX", "FreqX", "AmpY", "FreqY", "AmpZ", "FreqZ"]
-    p4 = ["Batt_level", "Timestamp", "Temp", "Pres", "Hum", "Co", "AccX", "AccY", "AccZ"]
-    p_req = ["OK"]
+    p0 = ["Val", "Batt_level", "Timestamp"]
+    p1 = ["Val", "Batt_level", "Timestamp", "Temp", "Pres", "Hum", "Co"]
+    p2 = ["Val", "Batt_level", "Timestamp", "Temp", "Pres", "Hum", "Co", "RMS"]
+    p3 = ["Val", "Batt_level", "Timestamp", "Temp", "Pres", "Hum", "Co", "RMS", "AmpX", "FreqX", "AmpY", "FreqY", "AmpZ", "FreqZ"]
+    p4 = ["Val", "Batt_level", "Timestamp", "Temp", "Pres", "Hum", "Co", "AccX", "AccY", "AccZ"]
+    p_req = ["Val", "OK"]
     p = [p0, p1, p2, p3, p4, p_req]
 
     try:

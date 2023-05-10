@@ -55,7 +55,7 @@ char* tcp_client(char *pkg)
         ESP_LOGI(TAG, "Socket created, connecting to %s:%d", host_ip, PORT);
 
         int err = connect(sock, (struct sockaddr *)&dest_addr, sizeof(dest_addr));
-        if (err != 0) {
+        if (err != 0) { 
             ESP_LOGE(TAG, "Socket unable to connect: errno %d", errno);
             break;
         }

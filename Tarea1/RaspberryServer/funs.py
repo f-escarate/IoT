@@ -29,13 +29,13 @@ def select_options():
 
     transport_layer = 1 # TCP = 0 and UDP = 1
     if protocol in [0,1,2,3]:
-        print("Select the transport layer (TCP = 0 and UDP = 1)")
+        print("Select the transport layer (TCP = t and UDP = u)")
         while True:
-            if keyboard.is_pressed("0"):
+            if keyboard.is_pressed("t"):
                 print(" -> You selected TCP")
                 transport_layer = 0
                 break
-            elif keyboard.is_pressed("1"):
+            elif keyboard.is_pressed("u"):
                 print(" -> You selected UDP")
                 transport_layer = 1
                 break
