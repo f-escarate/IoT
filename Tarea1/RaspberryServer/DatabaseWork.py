@@ -39,7 +39,13 @@ def dataSave(header, data):
         if key in data:
             insertData[key] = data[key]
     
-    print("insertData", insertData, len(insertData))
+    # If is the 4th protocol, we transform the lists to json data
+    if insertData["Protocol"] == 4:
+        insertData["AccX"] = json.dumps(insertData["AccX"])
+        insertData["AccY"] = json.dumps(insertData["AccY"])
+        insertData["AccZ"] = json.dumps(insertData["AccZ"])
+    
+    print("Timestamp: ", insertData["Timestamp"])
         
     cur.execute('''INSERT INTO Datos (DeviceID, MAC, Status, Protocol, BattLevel, Timestamp, Temp, Press, Hum, Co, RMS, AmpX, FreqX, AmpY, FreqY, AmpZ, FreqZ, AccX, AccY, AccZ) 
     values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)''', tuple(insertData.values()))

@@ -68,15 +68,13 @@ char* mensaje (char protocol, char transportLayer){
 			data = dataprotocol0();
 			break;
 	}
+	ESP_LOGI(TAG2, "Dataaaaa: %s", data);
 	memcpy((void*) mnsj, (void*) hdr, 12);										// Coping header
+	ESP_LOGI(TAG2, "Dataaaaa:1 %s", data);
 	memcpy((void*) mnsj+12, (void*) data, dataLength(protocol));				// Coping data
+	ESP_LOGI(TAG2, "Dataaaaa:2 %s", data);
 	memcpy((void*) mnsj+12+dataLength(protocol), (void*) end_of_pkg, end_len);	// Coping end of package
-	
-	// Changing the '\0's characters in the message by '\n's, in order to be received by the server's socket
-	for(uint8_t i = 0; i < msg_len; i++)
-		if(mnsj[i]==0)
-			mnsj[i]='\n';
-
+	ESP_LOGI(TAG2, "Dataaaaa:3 %s", data);
 
 	ESP_LOGI(TAG2, "HEADER: %s", hdr);
 	ESP_LOGI(TAG2, "Data: %s", data);

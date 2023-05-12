@@ -1,0 +1,25 @@
+[1/10] Performing build step for 'bootloader'
+[1/1] cd /home/felipe/Desktop/Tareas/IoT/Tarea1/tcp_udp_client/build/bootloader/esp-idf/esptool_py && /home/felipe/.espressif/python_env/idf5.1_py3.10_env/bin/python /home/felipe/esp/esp-idf/components/partition_table/check_sizes.py --offset 0x8000 bootloader 0x1000 /home/felipe/Desktop/Tareas/IoT/Tarea1/tcp_udp_client/build/bootloader/bootloader.bin
+Bootloader binary size 0x6820 bytes. 0x7e0 bytes (7%) free.
+[2/8] Building C object esp-idf/main/CMakeFiles/__idf_main.dir/tcp_client_main.c.obj
+/home/felipe/Desktop/Tareas/IoT/Tarea1/tcp_udp_client/main/tcp_client_main.c: In function 'app_main':
+/home/felipe/Desktop/Tareas/IoT/Tarea1/tcp_udp_client/main/tcp_client_main.c:40:35: warning: passing argument 1 of 'tcp_client' makes pointer from integer without a cast [-Wint-conversion]
+   40 |             response = tcp_client(protocol);
+      |                                   ^~~~~~~~
+      |                                   |
+      |                                   char
+/home/felipe/Desktop/Tareas/IoT/Tarea1/tcp_udp_client/main/tcp_client_main.c:13:31: note: expected 'char *' but argument is of type 'char'
+   13 | extern char* tcp_client(char* pkg);
+      |                         ~~~~~~^~~
+[3/8] Building C object esp-idf/main/CMakeFiles/__idf_main.dir/tcp_client_v4.c.obj
+[4/8] Linking C static library esp-idf/main/libmain.a
+[5/8] Generating ld/sections.ld
+[6/8] Linking CXX executable tcp_client.elf
+[7/8] Generating binary image from built executable
+esptool.py v4.5.1
+Creating esp32 image...
+Merged 25 ELF sections
+Successfully created esp32 image.
+Generated /home/felipe/Desktop/Tareas/IoT/Tarea1/tcp_udp_client/build/tcp_client.bin
+[8/8] cd /home/felipe/Desktop/Tareas/IoT/Tarea1/tcp_udp_client/build/esp-idf/esptool_py && /home/felipe/.espressif/python_env/idf5.1_py3.10_env/bin/python /home/felipe/esp/esp-idf/components/partition_table/check_sizes.py --offset 0x8000 partition --type app /home/felipe/Desktop/Tareas/IoT/Tarea1/tcp_udp_client/build/partition_table/partition-table.bin /home/felipe/Desktop/Tareas/IoT/Tarea1/tcp_udp_client/build/tcp_client.bin
+tcp_client.bin binary size 0xbcd60 bytes. Smallest app partition is 0x100000 bytes. 0x432a0 bytes (26%) free.

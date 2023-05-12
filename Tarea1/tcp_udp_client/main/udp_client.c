@@ -36,11 +36,20 @@
 #define PORT CONFIG_EXAMPLE_PORT
 
 static const char *TAG = "example";
+extern char* mensaje (char protocol, char transportLayer);
+extern unsigned short messageLength(char protocol);
+
+unsigned short min(unsigned short x, unsigned short y){
+    if (x<y)
+        return x;
+    return y;
+}
 
 
-void udp_client_task(void *pvParameters)
+char* udp_client_task(char protocol)
 {
-    char *pkg = (char*) pvParameters;
+    char transport_layer = 1;
+    char* pkg = mensaje(protocol, transport_layer);
     char rx_buffer[128];
     char host_ip[] = HOST_IP_ADDR;
     int addr_family = 0;
@@ -83,13 +92,24 @@ void udp_client_task(void *pvParameters)
         ESP_LOGI(TAG, "Socket created, sending to %s:%d", HOST_IP_ADDR, PORT);
 
         while (1) {
+            
+            int sent = 0;
+            int to_send = min(messageLength(protocol), 1024);
+            while(sent<messageLength(protocol)){
 
-            int err = sendto(sock, pkg, strlen(pkg), 0, (struct sockaddr *)&dest_addr, sizeof(dest_addr));
-            if (err < 0) {
-                ESP_LOGE(TAG, "Error occurred during sending: errno %d", errno);
-                break;
+                int err = sendto(sock, pkg+sent, to_send, 0, (struct sockaddr *)&dest_addr, sizeof(dest_addr));
+                if (err < 0) {
+                    ESP_LOGE(TAG, "Error occurred during sending: errno %d", errno);
+                    break;
+                }
+                sent += to_send;
+                to_send = min(messageLength(protocol)-sent, 1024);
+
             }
+
+            
             ESP_LOGI(TAG, "Message sent");
+            free(pkg);
 
             struct sockaddr_storage source_addr; // Large enough for both IPv4 or IPv6
             socklen_t socklen = sizeof(source_addr);
@@ -105,9 +125,24 @@ void udp_client_task(void *pvParameters)
                 rx_buffer[len] = 0; // Null-terminate whatever we received and treat like a string
                 ESP_LOGI(TAG, "Received %d bytes from %s:", len, host_ip);
                 ESP_LOGI(TAG, "%s", rx_buffer);
-                if (strncmp(rx_buffer, "OK: ", 4) == 0) {
-                    ESP_LOGI(TAG, "Received expected message, reconnecting");
-                    break;
+                char ok = rx_buffer[0];
+                char change = rx_buffer[1];
+                // If the message is ok and is a change on the protocol, we update the variables
+                if(ok){
+                    if(change){
+                        transport_layer = rx_buffer[2];
+                        // If is changed to TCP
+                        if(!transport_layer){
+                            shutdown(sock, 0);
+                            close(sock);
+                            char* ret = malloc(4*sizeof(char));
+                            memcpy(ret, rx_buffer, 4*sizeof(char));
+                            return ret;
+                        }
+                        else
+                            protocol = rx_buffer[3];
+                    }
+                    pkg = mensaje(protocol, transport_layer);
                 }
             }
 
@@ -121,6 +156,7 @@ void udp_client_task(void *pvParameters)
         }
     }
     vTaskDelete(NULL);
+    return NULL;
 }
 
 /* void app_main(void)

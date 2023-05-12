@@ -24,13 +24,10 @@ def response(change:bool=False, status:int=255, protocol:int=255):
 
 def parseData(packet):
     header = packet[:12]
-    print("header_ ", header)
     data = packet[12:]
-    print("data: ", data)
     header = headerDict(header)
     print("headerDicc_ ", header)
     dataD = dataDict(header["protocol"], data)
-    print("dataD: ", dataD)
     
     if dataD is not None:
         if header["protocol"] == 5:
@@ -42,7 +39,7 @@ def parseData(packet):
 
 # Ver https://docs.python.org/3/library/struct.html para más detalles
 def protUnpack(protocol:int, data):
-    protocol_unpack = ["<BBi", "<BBiBIBf","<BBiBIBff","<BBiBIBffffffff", "<BBiBIBf8000s8000s8000s", "<BB"]
+    protocol_unpack = ["<BBi", "<BBiBIBf","<BBiBIBff","<BBiBIBffffffff", "<BBiBIBf"+6000*"f", "<BB"]
     """
     < :     little endian
     B :     unsigned char
@@ -55,11 +52,16 @@ def protUnpack(protocol:int, data):
     protocolo 1:    "<BBiBIBf"
     protocolo 2:    "<BBiBIBff"
     protocolo 3:    "<BBiBIBffffffff"
-    protocolo 4:    "<BBiBIBf8000s8000s8000s"
+    protocolo 4:    "<BBiBIBfff....ffff"
     protocolo_req:  "<BB"
     
     """
-    return unpack(protocol_unpack[protocol], data)
+    
+    res = unpack(protocol_unpack[protocol], data)
+    if protocol == 4:
+        return res[:7] + tuple([list(res[7:2007])]) + tuple([list(res[2007:4007])]) + tuple([list(res[4007:6007])])
+    
+    return res
 
 def headerDict(data):
     ID_device, M1, M2, M3, M4, M5, M6, protocol, status, leng_msg = unpack("<H6B2BH", data)

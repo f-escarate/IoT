@@ -10,9 +10,8 @@
 #include "esp_log.h"
 
 
-extern void tcp_client(char* pkg);
-extern char* tcp_client_recv(void);
-extern void udp_client_task(void *pvParameters);
+extern char* tcp_client(char protocol);
+extern char* udp_client_task(char protocol);
 extern char* mensaje (char protocol, char transportLayer);
 
 
@@ -30,25 +29,21 @@ void app_main(void)
      */
     ESP_ERROR_CHECK(example_connect());
 
+    // The first message to send is a request using tcp (transport_layer = 0)
+    char protocol = 5; char transport_layer = 0;
 
-    // Initial connection
-    char* config = tcp_client_recv();
-    char ID_protocol = config[2];
-    char Transport_Layer = config[3];
-    ESP_LOGE(TAG3, "%u,%u,%u,%u,protocol %u transportlayer %u:",config[0],config[1],config[2],config[3], ID_protocol, Transport_Layer);
-
-
-    // Creating the pkg based on the protocol
-    char* pkg = mensaje(ID_protocol, Transport_Layer);
-
-    // Selecting TCP=0 or UDP=1 in order to send the message
-    if (Transport_Layer == 0) {
-        tcp_client(pkg);
+    char* response = NULL; char change = 0;
+    while(change != 3){
+        // Selecting TCP=0 or UDP=1 in order to send the message
+        if (transport_layer == 0)
+            response = tcp_client(protocol);
+        else if (transport_layer == 1) 
+            response = udp_client_task(protocol);
+        
+        transport_layer = response[2];
+        protocol = response[3];
+        free(response);
+        
+        ESP_LOGE(TAG3, "%u,%u,%u,%u,protocol %u transportlayer %u:",response[0],response[1],response[2],response[3], protocol, transport_layer);
     }
-    else if (Transport_Layer == 1) {
-        xTaskCreate(udp_client_task, "udp_client", 4096, pkg, 5, NULL);
-    }
-
-    // 
-    
 }

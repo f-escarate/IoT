@@ -25,6 +25,7 @@ def select_options():
             break
         elif keyboard.is_pressed("4"):
             print(" -> You selected the protocol 4")
+            protocol = 4
             break
 
     transport_layer = 1 # TCP = 0 and UDP = 1
@@ -59,6 +60,7 @@ def connection(host, port):
             break
         
         print(f'Conectado por alguien ({addr[0]}) desde el puerto {addr[1]}')
+        change = False
         while True:
             try:
                 data = TCP_frag_recv(conn)
@@ -73,22 +75,37 @@ def connection(host, port):
             except:
                 conn.close()
                 break
+            print(f"Recibido {data}")
             parsedData = parseData(data)
-            print(f"Recibido {parsedData}")
-                
+            print(parsedData)
+        
             # If the client, requested a protocol and transport_layer, we send it
-            change = False
             if parsedData["protocol"] == 5:
                 change=True
+            elif keyboard.is_pressed("c"):
+                protocol, transport_layer = select_options()
+                change = True
+            else:
+                change = False
             
             send_bytes = response(change=change, status=transport_layer, protocol=protocol)
             conn.send(send_bytes)
             
+            
+            
             # If the next connection is with UDP, we try to connect using UDP socket
-            if parsedData["protocol"] == 5 and transport_layer == 1:
+            if transport_layer == 1:
+                print("-------------TO UDP----------------")
                 conn.close()
-                recv_UDP((host, port), protocol)
-                return
+                protocol, transport_layer = recv_UDP((host, port), protocol)
+                try:
+                    print("Esperando conexión...")
+                    conn, addr = s.accept()
+                except KeyboardInterrupt:
+                    conn.close()
+                    print("\nCerrando la conexión")
+                    break
+                continue
 
         conn.close()
         print('Desconectado')
@@ -98,6 +115,8 @@ def recv_UDP(address, protocol):
                   socket.SOCK_DGRAM) #UDP
     s.bind(address)
     
+    change = False
+    transport_layer = 1
     while True:
         while True:
             try:
@@ -107,11 +126,21 @@ def recv_UDP(address, protocol):
                     break
             except:
                 break
-            print(f"Recibido {data}")
-            send_bytes = bytearray()
-            send_bytes.append(99)          # 'c': is for tell the client, that we received the pkg
-
             parsedData = parseData(data)
-            print(parsedData)
-
+            
+            if keyboard.is_pressed("c"):
+                protocol, transport_layer = select_options()
+                change = True
+            else:
+                change = False
+            
+            send_bytes = response(change=change, status=transport_layer, protocol=protocol)
+            s.sendto(send_bytes, addr)
+            
+            # If the UDP connection is closed, we return
+            if transport_layer == 0:
+                s.close()
+                return protocol, transport_layer
+                
         print('Desconectado')
+    return protocol, transport_layer

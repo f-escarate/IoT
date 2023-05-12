@@ -12,6 +12,7 @@
 #include <arpa/inet.h>
 #include "esp_netif.h"
 #include "esp_log.h"
+#include "esp_sleep.h"
 #if defined(CONFIG_EXAMPLE_SOCKET_IP_INPUT_STDIN)
 #include "addr_from_stdin.h"
 #endif
@@ -26,9 +27,13 @@
 
 static const char *TAG = "example";
 extern char* mensaje (char protocol, char transportLayer);
+extern unsigned short messageLength(char protocol);
+//const int wakeup_time_sec = 60; // 60 seconds
 
-char* tcp_client(char *pkg)
+char* tcp_client(char protocol)
 {
+    char transport_layer = 0;
+    char *pkg = mensaje(protocol, transport_layer);
     char rx_buffer[128];
     char host_ip[] = HOST_IP_ADDR;
     int addr_family = 0;
@@ -62,7 +67,11 @@ char* tcp_client(char *pkg)
         ESP_LOGI(TAG, "Successfully connected");
 
         while (1) {
-            int err = send(sock, pkg, strlen(pkg), 0);
+            int err = send(sock, pkg, messageLength(protocol), 0);
+            //esp_sleep_enable_timer_wakeup(wakeup_time_sec * 1000000);
+            //esp_deep_sleep_start();
+
+
 	        ESP_LOGE(TAG, "Paquete: %s", pkg);
             if (err < 0) {
                 ESP_LOGE(TAG, "Error occurred during sending: errno %d", errno);
@@ -79,11 +88,25 @@ char* tcp_client(char *pkg)
             else {
                 rx_buffer[len] = 0; // Null-terminate whatever we received and treat like a string
                 ESP_LOGI(TAG, "Received %d bytes from %s:", len, host_ip);
-                ESP_LOGI(TAG, "%s", rx_buffer);
-                if(rx_buffer[0] == 1){
-                    char* ret = malloc(4*sizeof(char));
-                    memcpy(ret, rx_buffer, 4*sizeof(char));
-                    return ret;
+                ESP_LOGI(TAG, "%d%d%d%d", rx_buffer[0],rx_buffer[1],rx_buffer[2],rx_buffer[3]);
+                char ok = rx_buffer[0];
+                char change = rx_buffer[1];
+                // If the message is ok and is a change on the protocol, we update the variables
+                if(ok){
+                    if(change){
+                        transport_layer = rx_buffer[2];
+                        // If is changed to UDP
+                        if(transport_layer){
+                            shutdown(sock, 0);
+                            close(sock);
+                            char* ret = malloc(4*sizeof(char));
+                            memcpy(ret, rx_buffer, 4*sizeof(char));
+                            return ret;
+                        }
+                        else
+                            protocol = rx_buffer[3];
+                    }
+                    pkg = mensaje(protocol, transport_layer);
                 }
             }
         }
@@ -95,11 +118,4 @@ char* tcp_client(char *pkg)
         }
     }
     return NULL;
-}
-
-char* tcp_client_recv(void)
-{
-    char* pkg = mensaje(5, 0);
-    char* res = tcp_client(pkg);
-    return res;
 }

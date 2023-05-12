@@ -4,7 +4,7 @@
 #include "esp_system.h"
 #include "esp_mac.h"
 #include "esp_log.h"
-#include <time.h>
+#include <sys/time.h>
 
 #define PI 3.14159265358979323846
 
@@ -32,20 +32,16 @@ int randi(int min, int max){
     return (rand() % (max-min+1))+min;
 }
 
-float** accelerometer_sensor(){
-    float arr_x[2000];
-    float arr_y[2000];
-    float arr_z[2000];
+float* accelerometer_sensor(){
 
+    ESP_LOGI("sensors", "aa 0");
+    float* result = malloc(3*2000*sizeof(float));
+    ESP_LOGI("sensors", "aa 1");
     for (int i = 0; i < 2000; i++){
-        arr_x[i] = 2*sin(2*PI*0.001*randf(-8000, 8000));
-        arr_y[i] = 3*cos(2*PI*0.001*randf(-8000, 8000));
-        arr_z[i] = 10*sin(2*PI*0.001*randf(-8000, 8000));
+        result[i]      = 2*sin(2*PI*0.001*randf(-8000, 8000));
+        result[2000+i] = 3*cos(2*PI*0.001*randf(-8000, 8000));
+        result[4000+i] = 10*sin(2*PI*0.001*randf(-8000, 8000));
     }
-    float** result = malloc(3*2000*sizeof(float));
-    result[0] = arr_x;
-    result[1] = arr_y;
-    result[2] = arr_z;
     return result;
 }
 
@@ -72,7 +68,7 @@ char batt_sensor(){
 //  
 float* accelerometer_kpi(){
     float amp_x = randf(0.0059, 0.12);
-    float amp_y = randf(0.0041, 31.0);
+    float amp_y = randf(0.0041, 0.11);
     float amp_z = randf(0.008, 0.15);
     
     float frec_x = randf(29.0, 31.0);
@@ -94,8 +90,10 @@ float* accelerometer_kpi(){
 
 }
 
+// Returns the timestamp (4 bytes)
 int get_time() {
-    int ts = esp_log_timestamp();
-    ESP_LOGI("sensors", "time: %d", ts);
-    return ts;
+    struct timeval tv_now;
+    gettimeofday(&tv_now, NULL);
+    int time_ms = (int32_t)tv_now.tv_sec * 1000 + (int32_t)tv_now.tv_usec/1000;
+    return time_ms;
 }

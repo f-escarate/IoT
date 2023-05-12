@@ -158,7 +158,7 @@ static int get_src_iface(char *interface)
 #endif    // #if defined(CONFIG_IDF_TARGET_LINUX)
 
 
-void tcp_client(char *pkg)
+char* tcp_client(char *pkg)
 {
     char rx_buffer[128];
     char host_ip[] = HOST_IP_ADDR;
@@ -242,6 +242,11 @@ void tcp_client(char *pkg)
                 rx_buffer[len] = 0; // Null-terminate whatever we received and treat like a string
                 ESP_LOGI(TAG, "Received %d bytes from %s:", len, host_ip);
                 ESP_LOGI(TAG, "%s", rx_buffer);
+                if(rx_buffer[0] == 1){
+                    char* ret = malloc(4*sizeof(char));
+                    memcpy(ret, rx_buffer, 4*sizeof(char));
+                    return ret;
+                }
             }
         }
 
@@ -251,4 +256,5 @@ void tcp_client(char *pkg)
             close(sock);
         }
     }
+    return NULL;
 }
