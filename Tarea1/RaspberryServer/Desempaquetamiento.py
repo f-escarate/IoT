@@ -34,6 +34,11 @@ def parseData(packet):
             saveLog(header, data)
         else:
             dataSave(header, dataD)
+            message_id = getMessageID()
+            current_time = round(time.time() * 1000)
+            loss_data = (message_id, dataD['TimeStamp'] - current_time, header['length'] - len(data))
+
+            saveLoss(loss_data)
         
     return None if dataD is None else {**header, **dataD}
 

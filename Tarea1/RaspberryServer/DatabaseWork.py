@@ -1,5 +1,6 @@
 import json
 import mysql.connector
+import time
 
 # Documentación https://docs.python.org/3/library/sqlite3.html
 
@@ -52,17 +53,49 @@ def dataSave(header, data):
     
     mydb.commit()
     
-    
 def saveLog(header, data):
-    #mydb = mysql.connector.connect(
-    # host = "localhost",
-    #  user = "root",
-    #   password = "123"
-    #)
-    #cur = mydb.cursor()
-    
-    #cur.execute('''INSERT INTO T1_IoT.Logs ()  values ()''', () )
-    
-    pass
+    mydb = mysql.connector.connect(
+        host = "localhost",
+        user = "root",
+        password = "123",
+        database="T1_IoT"
+    )
+    cur = mydb.cursor()
 
+    insertData = {
+            "DeviceId": header["ID_device"],
+            "Status": header["status"] ,
+            "Protocol": header["protocol"],
+            "TimeStamp": data["Timestamp"]
+            }
+    
+    cur.execute('''INSERT INTO Logs (DeviceID, Status, Protocol, TimeStamp)  values (%s, %s, %s, %s)''', tuple(insertData.values()))
+    mydb.commit()
+
+def saveLoss(data):
+    mydb = mysql.connector.connect(
+        host = "localhost",
+        user = "root",
+        password = "123",
+        database="T1_IoT"
+    )
+    cur = mydb.cursor()
+    cur.execute('''INSERT INTO Loss (MessageID, Delay, PacketLoss)  values (%s, %s, %s, %s)''', data)
+    mydb.commit()
+
+def getMessageID():
+    mydb = mysql.connector.connect(
+        host = "localhost",
+        user = "root",
+        password = "123",
+        database="T1_IoT"
+    )
+    cur = mydb.cursor()
+    cur.execute(''' SELECT MessageId from Data ORDER BY MessageId DESC LIMIT 1''')
+    
+
+    message_id = cur.fetchall()[0]
+    print("Message_id: " + str(message_id))
+
+    return message_id
 
