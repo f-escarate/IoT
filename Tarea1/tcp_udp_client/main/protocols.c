@@ -5,7 +5,7 @@
 
 static const char *TAG8 = "PRotocols";
 
-unsigned short lengmsg[6] = {6, 16, 20, 44, 24016, 2};
+unsigned short lengmsg[6] = {6, 16, 20, 44, 24016, 4};
 // Entrega los posibles largos de cada protocolo
 unsigned short dataLength(char protocol){
     return lengmsg[ (unsigned int) protocol];
@@ -13,9 +13,9 @@ unsigned short dataLength(char protocol){
 
 // Arma un paquete para el protocolo de inicio, que busca solo respuesta
 char* data_request(){
-    char* msg = malloc(2);
-    msg[0] = 'g';
-    msg[1] = 'a';
+    char* msg = malloc(4);
+    int t = get_time();
+    memcpy(msg, (void*) &t, 4);
     return msg;
 }
 

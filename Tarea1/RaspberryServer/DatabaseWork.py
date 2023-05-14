@@ -48,7 +48,7 @@ def dataSave(header, data):
     
     print("Timestamp: ", insertData["Timestamp"])
         
-    cur.execute('''INSERT INTO Datos (DeviceID, MAC, Status, Protocol, BattLevel, Timestamp, Temp, Press, Hum, Co, RMS, AmpX, FreqX, AmpY, FreqY, AmpZ, FreqZ, AccX, AccY, AccZ) 
+    cur.execute('''INSERT INTO Datos (DeviceId, MAC, Status, Protocol, BattLevel, Timestamp, Temp, Press, Hum, Co, RMS, AmpX, FreqX, AmpY, FreqY, AmpZ, FreqZ, AccX, AccY, AccZ) 
     values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)''', tuple(insertData.values()))
     
     mydb.commit()
@@ -69,7 +69,7 @@ def saveLog(header, data):
             "TimeStamp": data["Timestamp"]
             }
     
-    cur.execute('''INSERT INTO Logs (DeviceID, Status, Protocol, TimeStamp)  values (%s, %s, %s, %s)''', tuple(insertData.values()))
+    cur.execute('''INSERT INTO Logs (ID_Device, TransportLayer, Protocol, Timestamp)  values (%s, %s, %s, %s)''', tuple(insertData.values()))
     mydb.commit()
 
 def saveLoss(data):
@@ -80,7 +80,7 @@ def saveLoss(data):
         database="T1_IoT"
     )
     cur = mydb.cursor()
-    cur.execute('''INSERT INTO Loss (MessageID, Delay, PacketLoss)  values (%s, %s, %s, %s)''', data)
+    cur.execute('''INSERT INTO Loss (MessageID, Delay, PacketLoss)  values (%s, %s, %s)''', data)
     mydb.commit()
 
 def getMessageID():
@@ -91,11 +91,34 @@ def getMessageID():
         database="T1_IoT"
     )
     cur = mydb.cursor()
-    cur.execute(''' SELECT MessageId from Data ORDER BY MessageId DESC LIMIT 1''')
+    cur.execute(''' SELECT MessageId from Datos ORDER BY MessageId DESC LIMIT 1''')
     
 
     message_id = cur.fetchall()[0]
     print("Message_id: " + str(message_id))
 
     return message_id
+
+def saveConfig(protocol, transport_layer):
+    mydb = mysql.connector.connect(
+        host = "localhost",
+        user = "root",
+        password = "123",
+        database="T1_IoT"
+    )
+    cur = mydb.cursor()
+    cur.execute('''UPDATE Configuracion SET Protocol=%s, TransportLayer=%s''', (protocol, transport_layer))
+    mydb.commit()
+
+def getConfig():
+    mydb = mysql.connector.connect(
+        host = "localhost",
+        user = "root",
+        password = "123",
+        database="T1_IoT"
+    )
+    cur = mydb.cursor()
+    cur.execute(''' SELECT Protocol, TransportLayer from Configuracion''')
+    protocol, transport_layer = cur.fetchall()[0]
+    return protocol, transport_layer
 

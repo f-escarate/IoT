@@ -13,6 +13,9 @@
 #include "esp_netif.h"
 #include "esp_log.h"
 #include "esp_sleep.h"
+//#include "esp_wifi.h"
+
+
 #if defined(CONFIG_EXAMPLE_SOCKET_IP_INPUT_STDIN)
 #include "addr_from_stdin.h"
 #endif
@@ -68,6 +71,8 @@ char* tcp_client(char protocol)
 
         while (1) {
             int err = send(sock, pkg, messageLength(protocol), 0);
+            //wifi_ps_type_t tipo_ahorro_energia = WIFI_PS_NONE;
+            //esp_wifi_set_ps(&tipo_ahorro_energia);
             //esp_sleep_enable_timer_wakeup(wakeup_time_sec * 1000000);
             //esp_deep_sleep_start();
 

@@ -12,19 +12,19 @@ mycursor = mydb.cursor()
 # Se crea la base de datos para la tarea
 # mycursor.execute("CREATE DATABASE T1_IoT")
 #mycursor.execute("DROP DATABASE T1_IoT")
-mycursor.execute("SHOW DATABASES")
+mycursor.execute("SHOW TABLES")
 for x in mycursor:
   print(x)
 
 # Se crean las tablas
 CreateDatos = '''CREATE TABLE Datos (
     MessageId INTEGER PRIMARY KEY AUTO_INCREMENT,
-    DeviceId INTEGER,
+    DeviceId INTEGER, 
     MAC TEXT NOT NULL,
     Status INTEGER NOT NULL,
     Protocol INTEGER NOT NULL,
     BattLevel INTEGER NOT NULL,
-    Timestamp INTEGER,
+    Timestamp BIGINT,
     Temp INTEGER,
     Press FLOAT,
     Hum INTEGER,
@@ -42,10 +42,10 @@ CreateDatos = '''CREATE TABLE Datos (
 );'''
 
 CreateLogs = '''CREATE TABLE Logs (
-    ID_Device INTEGER PRIMARY KEY,
+    ID_Device INTEGER,
     TransportLayer INTEGER NOT NULL,
     Protocol INTEGER NOT NULL,
-    Timestamp INTEGER,
+    Timestamp BIGINT
 );'''
 
 CreateConfiguracion = '''CREATE TABLE Configuracion (
@@ -61,9 +61,10 @@ CreateLoss = '''CREATE TABLE Loss (
     FOREIGN KEY (MessageId) REFERENCES Datos(MessageId)
 );'''
 
-mycursor.execute("DROP TABLE Datos")
 mycursor.execute("DROP TABLE Logs")
+mycursor.execute("DROP TABLE Loss")
 mycursor.execute("DROP TABLE Configuracion")
+mycursor.execute("DROP TABLE Datos")
 
 mycursor.execute(CreateDatos)
 mycursor.execute(CreateLogs)

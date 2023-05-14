@@ -16,6 +16,8 @@ Usamos struct para pasar de un array de bytes a una lista de numeros/strings. (h
 
 '''
 
+begin_time = 0
+esp_time = 0
     
 def response(change:bool=False, status:int=255, protocol:int=255):
     OK = 1
@@ -23,6 +25,9 @@ def response(change:bool=False, status:int=255, protocol:int=255):
     return pack("<BBBB", OK, CHANGE, status, protocol)
 
 def parseData(packet):
+    global begin_time
+    global esp_time
+    
     header = packet[:12]
     data = packet[12:]
     header = headerDict(header)
@@ -31,12 +36,20 @@ def parseData(packet):
     
     if dataD is not None:
         if header["protocol"] == 5:
-            saveLog(header, data)
+            begin_time = round(time.time()*1000)
+            esp_time = dataD['Timestamp']
+            saveLog(header, dataD)
+            #print("primer tiempo ", dataD['Timestamp'])
         else:
+            current_time = round(time.time()*1000)
+            dataD['Timestamp'] = begin_time+(dataD['Timestamp']-esp_time)
+            deltaT = current_time - dataD['Timestamp']
+            #print("---Timestamp: ", dataD['Timestamp'])
+            #print("....DELTAT ", deltaT)
             dataSave(header, dataD)
             message_id = getMessageID()
-            current_time = round(time.time() * 1000)
-            loss_data = (message_id, dataD['TimeStamp'] - current_time, header['length'] - len(data))
+            #print("---------aaaaaaaaaa ", message_id)
+            loss_data = (message_id[0], deltaT, header['length'] - len(data))
 
             saveLoss(loss_data)
         
@@ -44,7 +57,7 @@ def parseData(packet):
 
 # Ver https://docs.python.org/3/library/struct.html para más detalles
 def protUnpack(protocol:int, data):
-    protocol_unpack = ["<BBi", "<BBiBIBf","<BBiBIBff","<BBiBIBffffffff", "<BBiBIBf"+6000*"f", "<BB"]
+    protocol_unpack = ["<BBi", "<BBiBIBf","<BBiBIBff","<BBiBIBffffffff", "<BBiBIBf"+6000*"f", "<i"]
     """
     < :     little endian
     B :     unsigned char
@@ -87,7 +100,7 @@ def dataDict(protocol:int, data):
     p2 = ["Val", "Batt_level", "Timestamp", "Temp", "Pres", "Hum", "Co", "RMS"]
     p3 = ["Val", "Batt_level", "Timestamp", "Temp", "Pres", "Hum", "Co", "RMS", "AmpX", "FreqX", "AmpY", "FreqY", "AmpZ", "FreqZ"]
     p4 = ["Val", "Batt_level", "Timestamp", "Temp", "Pres", "Hum", "Co", "AccX", "AccY", "AccZ"]
-    p_req = ["Val", "OK"]
+    p_req = ["Timestamp"]
     p = [p0, p1, p2, p3, p4, p_req]
 
     try:

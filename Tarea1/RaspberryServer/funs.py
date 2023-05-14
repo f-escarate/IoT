@@ -2,6 +2,7 @@ import keyboard
 import socket
 from juntarFragm import TCP_frag_recv, UDP_frag_recv
 from Desempaquetamiento import parseData, response
+from DatabaseWork import saveConfig, getConfig
 
 def select_options():
     print("Select the protocol (0, 1, 2, 3, 4) ")
@@ -40,7 +41,7 @@ def select_options():
                 print(" -> You selected UDP")
                 transport_layer = 1
                 break
-    return protocol, transport_layer
+    saveConfig(protocol, transport_layer)
 
 def connection(host, port):
     s = socket.socket(socket.AF_INET, #internet
@@ -48,8 +49,7 @@ def connection(host, port):
     s.bind((host, port))
     s.listen(5)
     print(f"Listening on {host}:{port}")
-    protocol, transport_layer = select_options()
-    
+    protocol, transport_layer = getConfig()
     while True:
         try:
             print("Esperando conexión...")
@@ -83,7 +83,8 @@ def connection(host, port):
             if parsedData["protocol"] == 5:
                 change=True
             elif keyboard.is_pressed("c"):
-                protocol, transport_layer = select_options()
+                select_options()
+                protocol, transport_layer = getConfig()
                 change = True
             else:
                 change = False
@@ -97,7 +98,8 @@ def connection(host, port):
             if transport_layer == 1:
                 print("-------------TO UDP----------------")
                 conn.close()
-                protocol, transport_layer = recv_UDP((host, port), protocol)
+                recv_UDP((host, port), protocol)
+                protocol, transport_layer = getConfig()
                 try:
                     print("Esperando conexión...")
                     conn, addr = s.accept()
@@ -129,7 +131,8 @@ def recv_UDP(address, protocol):
             parsedData = parseData(data)
             
             if keyboard.is_pressed("c"):
-                protocol, transport_layer = select_options()
+                select_options()
+                protocol, transport_layer = getConfig()
                 change = True
             else:
                 change = False
@@ -140,7 +143,7 @@ def recv_UDP(address, protocol):
             # If the UDP connection is closed, we return
             if transport_layer == 0:
                 s.close()
-                return protocol, transport_layer
+                return
                 
         print('Desconectado')
-    return protocol, transport_layer
+    return
