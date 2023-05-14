@@ -3,13 +3,14 @@ import mysql.connector
 mydb = mysql.connector.connect(
   host="localhost",
   user="root",
-  password="p455w0rd"
+  password="123",
+  database="T1_IoT"
 )
 
 mycursor = mydb.cursor()
 
 # Se crea la base de datos para la tarea
-mycursor.execute("CREATE DATABASE T1_IoT")
+# mycursor.execute("CREATE DATABASE T1_IoT")
 #mycursor.execute("DROP DATABASE T1_IoT")
 mycursor.execute("SHOW DATABASES")
 for x in mycursor:
@@ -17,12 +18,13 @@ for x in mycursor:
 
 # Se crean las tablas
 CreateDatos = '''CREATE TABLE Datos (
-    MessageId INTEGER PRIMARY KEY,
+    MessageId INTEGER PRIMARY KEY AUTO_INCREMENT,
+    DeviceId INTEGER,
     MAC TEXT NOT NULL,
     Status INTEGER NOT NULL,
     Protocol INTEGER NOT NULL,
     BattLevel INTEGER NOT NULL,
-    Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+    Timestamp INTEGER,
     Temp INTEGER,
     Press FLOAT,
     Hum INTEGER,
@@ -36,14 +38,14 @@ CreateDatos = '''CREATE TABLE Datos (
     FreqZ FLOAT,
     AccX JSON,
     AccY JSON,
-    AccZ JSON,
+    AccZ JSON
 );'''
 
 CreateLogs = '''CREATE TABLE Logs (
     ID_Device INTEGER PRIMARY KEY,
     TransportLayer INTEGER NOT NULL,
     Protocol INTEGER NOT NULL,
-    Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+    Timestamp INTEGER,
 );'''
 
 CreateConfiguracion = '''CREATE TABLE Configuracion (
@@ -53,12 +55,15 @@ CreateConfiguracion = '''CREATE TABLE Configuracion (
 
 CreateLoss = '''CREATE TABLE Loss (
     MessageId INTEGER,
-    Delay DATETIME DEFAULT CURRENT_TIMESTAMP,
+    Delay INTEGER,
     PacketLoss INTEGER,
-    PRIMARY KEY (MessageId)
+    PRIMARY KEY (MessageId),
     FOREIGN KEY (MessageId) REFERENCES Datos(MessageId)
 );'''
 
+mycursor.execute("DROP TABLE Datos")
+mycursor.execute("DROP TABLE Logs")
+mycursor.execute("DROP TABLE Configuracion")
 
 mycursor.execute(CreateDatos)
 mycursor.execute(CreateLogs)
