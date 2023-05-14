@@ -18,6 +18,7 @@ Usamos struct para pasar de un array de bytes a una lista de numeros/strings. (h
 
 begin_time = 0
 esp_time = 0
+end_response = pack("<BBBB", 0, 0, 0, 0)
     
 def response(change:bool=False, status:int=255, protocol:int=255):
     OK = 1

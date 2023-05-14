@@ -32,14 +32,15 @@ void app_main(void)
     // The first message to send is a request using tcp (transport_layer = 0)
     char protocol = 5; char transport_layer = 0;
 
-    char* response = NULL; char change = 0;
-    while(change != 3){
+    char* response = NULL; char ok = 1;
+    while(ok){
         // Selecting TCP=0 or UDP=1 in order to send the message
         if (transport_layer == 0)
             response = tcp_client(protocol);
         else if (transport_layer == 1) 
             response = udp_client_task(protocol);
         
+        ok = response[0];
         transport_layer = response[2];
         protocol = response[3];
         free(response);

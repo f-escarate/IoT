@@ -95,9 +95,9 @@ char* udp_client_task(char protocol)
             
             int sent = 0;
             int to_send = min(messageLength(protocol), 1024);
+            int err;
             while(sent<messageLength(protocol)){
-
-                int err = sendto(sock, pkg+sent, to_send, 0, (struct sockaddr *)&dest_addr, sizeof(dest_addr));
+                err = sendto(sock, pkg+sent, to_send, 0, (struct sockaddr *)&dest_addr, sizeof(dest_addr));
                 if (err < 0) {
                     ESP_LOGE(TAG, "Error occurred during sending: errno %d", errno);
                     break;
@@ -106,8 +106,8 @@ char* udp_client_task(char protocol)
                 to_send = min(messageLength(protocol)-sent, 1024);
 
             }
-
-            
+            char* end_of_send = "\0";
+            err = sendto(sock, end_of_send, 1, 0, (struct sockaddr *)&dest_addr, sizeof(dest_addr));
             ESP_LOGI(TAG, "Message sent");
             free(pkg);
 
@@ -143,6 +143,11 @@ char* udp_client_task(char protocol)
                             protocol = rx_buffer[3];
                     }
                     pkg = mensaje(protocol, transport_layer);
+                }
+                else{
+                    char* ret = malloc(4*sizeof(char));
+                    memcpy(ret, rx_buffer, 4*sizeof(char));
+                    return ret;
                 }
             }
 

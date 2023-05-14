@@ -28,12 +28,15 @@ def UDP_frag_recv(s):
     while True:
         try:
             data, addr = s.recvfrom(1024)
-            doc += data
-            idx = doc.find(end_of_packet)
-            print("----- Data", len(doc), idx)
-            if idx != -1:
-                doc = doc[:idx]
-                break
+            print(data)
+            if data != b'\x00':
+                doc += data
+            else:
+                idx = doc.find(end_of_packet)
+                print("----- Data", len(doc), idx)
+                if idx != -1:
+                    doc = doc[:idx]
+                    break
         except TimeoutError:
             raise
         except Exception:

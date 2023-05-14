@@ -13,7 +13,8 @@
 #include "esp_netif.h"
 #include "esp_log.h"
 #include "esp_sleep.h"
-//#include "esp_wifi.h"
+//#include <WiFi.h>
+#include "esp_wifi.h"
 
 
 #if defined(CONFIG_EXAMPLE_SOCKET_IP_INPUT_STDIN)
@@ -31,12 +32,12 @@
 static const char *TAG = "example";
 extern char* mensaje (char protocol, char transportLayer);
 extern unsigned short messageLength(char protocol);
-//const int wakeup_time_sec = 60; // 60 seconds
+const int wakeup_time_sec = 5; // 60 seconds
 
 char* tcp_client(char protocol)
 {
+    char original_protocol = protocol;
     char transport_layer = 0;
-    char *pkg = mensaje(protocol, transport_layer);
     char rx_buffer[128];
     char host_ip[] = HOST_IP_ADDR;
     int addr_family = 0;
@@ -70,14 +71,16 @@ char* tcp_client(char protocol)
         ESP_LOGI(TAG, "Successfully connected");
 
         while (1) {
+            char *pkg = mensaje(protocol, transport_layer);
+	        ESP_LOGE(TAG, "Paquete: %s", pkg);
             int err = send(sock, pkg, messageLength(protocol), 0);
+            free(pkg);
+
             //wifi_ps_type_t tipo_ahorro_energia = WIFI_PS_NONE;
             //esp_wifi_set_ps(&tipo_ahorro_energia);
-            //esp_sleep_enable_timer_wakeup(wakeup_time_sec * 1000000);
-            //esp_deep_sleep_start();
+            
 
 
-	        ESP_LOGE(TAG, "Paquete: %s", pkg);
             if (err < 0) {
                 ESP_LOGE(TAG, "Error occurred during sending: errno %d", errno);
                 break;
@@ -111,9 +114,19 @@ char* tcp_client(char protocol)
                         else
                             protocol = rx_buffer[3];
                     }
-                    pkg = mensaje(protocol, transport_layer);
+                }
+                else{
+                    char* ret = malloc(4*sizeof(char));
+                    memcpy(ret, rx_buffer, 4*sizeof(char));
+                    return ret;
                 }
             }
+            // Deepsleep
+            if(original_protocol != 5){
+                esp_sleep_enable_timer_wakeup(wakeup_time_sec * 1000000);
+                esp_deep_sleep_start();
+            }
+            original_protocol = protocol;   
         }
 
         if (sock != -1) {
