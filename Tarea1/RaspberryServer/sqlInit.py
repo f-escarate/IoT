@@ -10,7 +10,7 @@ mydb = mysql.connector.connect(
 mycursor = mydb.cursor()
 
 # Se crea la base de datos para la tarea
-# mycursor.execute("CREATE DATABASE T1_IoT")
+#mycursor.execute("CREATE DATABASE T1_IoT")
 #mycursor.execute("DROP DATABASE T1_IoT")
 mycursor.execute("SHOW TABLES")
 for x in mycursor:

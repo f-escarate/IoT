@@ -110,6 +110,7 @@ def saveConfig(protocol, transport_layer):
     cur.execute('''UPDATE Configuracion SET Protocol=%s, TransportLayer=%s''', (protocol, transport_layer))
     mydb.commit()
 
+
 def getConfig():
     mydb = mysql.connector.connect(
         host = "localhost",
