@@ -46,7 +46,7 @@ def dataSave(header, data):
         insertData["AccY"] = json.dumps(insertData["AccY"])
         insertData["AccZ"] = json.dumps(insertData["AccZ"])
     
-    print("Timestamp: ", insertData["Timestamp"])
+    print("Transformed Timestamp: ", insertData["Timestamp"])
         
     cur.execute('''INSERT INTO Datos (DeviceId, MAC, Status, Protocol, BattLevel, Timestamp, Temp, Press, Hum, Co, RMS, AmpX, FreqX, AmpY, FreqY, AmpZ, FreqZ, AccX, AccY, AccZ) 
     values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)''', tuple(insertData.values()))
@@ -95,7 +95,7 @@ def getMessageID():
     
 
     message_id = cur.fetchall()[0]
-    print("Message_id: " + str(message_id))
+    print("Message_id: " + str(message_id[0]))
 
     return message_id
 

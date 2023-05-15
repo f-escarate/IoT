@@ -32,7 +32,6 @@ def parseData(packet):
     header = packet[:12]
     data = packet[12:]
     header = headerDict(header)
-    print("headerDicc_ ", header)
     dataD = dataDict(header["protocol"], data)
     
     if dataD is not None:

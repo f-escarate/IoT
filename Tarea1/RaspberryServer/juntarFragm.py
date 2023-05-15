@@ -7,7 +7,6 @@ def TCP_frag_recv(conn):
             conn.settimeout(5)
             doc += conn.recv(1024)
             idx = doc.find(end_of_packet)
-            print(len(doc), doc, idx)
             if idx != -1:
                 doc = doc[:idx]
                 break
@@ -19,7 +18,6 @@ def TCP_frag_recv(conn):
             raise
         conn.send(b'\1')
 
-    print("doooc", doc)
     return doc
 
 def UDP_frag_recv(s):
@@ -28,12 +26,10 @@ def UDP_frag_recv(s):
     while True:
         try:
             data, addr = s.recvfrom(1024)
-            print(data)
             if data != b'\x00':
                 doc += data
             else:
                 idx = doc.find(end_of_packet)
-                print("----- Data", len(doc), idx)
                 if idx != -1:
                     doc = doc[:idx]
                     break

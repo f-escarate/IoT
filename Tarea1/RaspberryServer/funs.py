@@ -74,14 +74,13 @@ def connection(host, port):
             elif select == False:
                 protocol, transport_layer = getConfig()
                 
-            print("Esperando conexión...")
+            print("Waiting for connection...")
             conn, addr = s.accept()
         except KeyboardInterrupt:
-            conn.close()
-            print("\nCerrando la conexión")
+            print("\nClosing")
             break
         
-        print(f'Conectado por alguien ({addr[0]}) desde el puerto {addr[1]}')
+        print(f'Someone has been connected from {addr[0]}:{addr[1]}')
         change = False
         while True:
             try:
@@ -89,17 +88,17 @@ def connection(host, port):
                 if data == b'':
                     break
             except KeyboardInterrupt:
-                print("\nCerrando la conexión")
+                print("\nClosing connection")
                 conn.close()
+                s.close()
                 return
             except ConnectionResetError:
                 break
             except:
                 conn.close()
                 break
-            print(f"Recibido {data}")
             parsedData = parseData(data)
-            print(parsedData)
+            print('Data received: ', parsedData)
         
             # If the client, requested a protocol and transport_layer, we send it
             if parsedData["protocol"] == 5:
@@ -108,7 +107,7 @@ def connection(host, port):
                 # Is true when the user selects "close connection"
                 if select_options():
                     conn.send(end_response)
-                    print("Se cierra la conexión")
+                    print("Closing Connection")
                     conn.close()
                     s.close()
                     return
@@ -128,21 +127,21 @@ def connection(host, port):
                 conn.close()
                 # Is true when the user selects "close connection"
                 if recv_UDP((host, port), protocol):
-                    print("Se cierra la conexión")
+                    print("Closing Connection")
                     return
                 print("-------------TO TCP----------------")
                 protocol, transport_layer = getConfig()
                 try:
-                    print("Esperando conexión...")
+                    print("Waiting for connection...")
                     conn, addr = s.accept()
                 except KeyboardInterrupt:
                     conn.close()
-                    print("\nCerrando la conexión")
+                    print("\nClosing Connection")
                     break
                 continue
 
         conn.close()
-        print('Desconectado')
+        print('Disconnected')
 
 def recv_UDP(address, protocol):
     s = socket.socket(socket.AF_INET, #internet
@@ -155,13 +154,24 @@ def recv_UDP(address, protocol):
         while True:
             try:
                 data, addr = UDP_frag_recv(s)
-                print(f'Se recibe de ({addr[0]}) desde el puerto {addr[1]}')
+                print(f'Data received from {addr[0]}:{addr[1]}')
                 if data == b'':
                     break
             except:
                 break
             parsedData = parseData(data)
             
+            # Print data
+            if parsedData["protocol"] != 4:
+                print('Data received: ', parsedData)
+            else:
+                printData = parsedData
+                printData["AccX"] = parsedData["AccX"][:3] + ["..."] + parsedData["AccX"][len(parsedData["AccX"])-4 : len(parsedData["AccX"])]
+                printData["AccY"] = parsedData["AccY"][:3] + ["..."] + parsedData["AccY"][len(parsedData["AccY"])-4 : len(parsedData["AccY"])]
+                printData["AccZ"] = parsedData["AccZ"][:3] + ["..."] + parsedData["AccZ"][len(parsedData["AccZ"])-4 : len(parsedData["AccZ"])]
+                print('Data received: ', printData)
+                
+            # Check for protocol/transport_layer change
             if keyboard.is_pressed("c"):
                 # Is true when the user selects "close connection"
                 if select_options():
@@ -180,5 +190,5 @@ def recv_UDP(address, protocol):
                 s.close()
                 return False
                 
-        print('Desconectado')
+        print('Disconnected')
     return False
