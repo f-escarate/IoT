@@ -32,7 +32,7 @@
 static const char *TAG = "example";
 extern char* mensaje (char protocol, char transportLayer);
 extern unsigned short messageLength(char protocol);
-const int wakeup_time_sec = 5; // 60 seconds
+const int wakeup_time_sec = 60; // 60 seconds
 
 char* tcp_client(char protocol)
 {
