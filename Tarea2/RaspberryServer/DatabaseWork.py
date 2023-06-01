@@ -9,7 +9,7 @@ def dataSave(header, data):
         host = "localhost",
         user = "root",
         password = "123",
-        database="T2_IoT"
+        database="T1_IoT"
     )
     cur = mydb.cursor()
     
@@ -30,17 +30,26 @@ def dataSave(header, data):
             "AmpY": None,
             "FreqY": None,
             "AmpZ": None,
-            "FreqZ": None
+            "FreqZ": None,
+            "AccX": None,
+            "AccY": None,
+            "AccZ": None
             }
     # Replacing the data in the dictionary 
     for key in insertData:
         if key in data:
             insertData[key] = data[key]
-                
+    
+    # If is the 4th protocol, we transform the lists to json data
+    if insertData["Protocol"] == 4:
+        insertData["AccX"] = json.dumps(insertData["AccX"])
+        insertData["AccY"] = json.dumps(insertData["AccY"])
+        insertData["AccZ"] = json.dumps(insertData["AccZ"])
+    
     print("Transformed Timestamp: ", insertData["Timestamp"])
         
-    cur.execute('''INSERT INTO Datos (DeviceId, MAC, Status, Protocol, BattLevel, Timestamp, Temp, Press, Hum, Co, RMS, AmpX, FreqX, AmpY, FreqY, AmpZ, FreqZ) 
-    values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)''', tuple(insertData.values()))
+    cur.execute('''INSERT INTO Datos (DeviceId, MAC, Status, Protocol, BattLevel, Timestamp, Temp, Press, Hum, Co, RMS, AmpX, FreqX, AmpY, FreqY, AmpZ, FreqZ, AccX, AccY, AccZ) 
+    values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)''', tuple(insertData.values()))
     
     mydb.commit()
     
@@ -49,7 +58,7 @@ def saveLog(header, data):
         host = "localhost",
         user = "root",
         password = "123",
-        database="T2_IoT"
+        database="T1_IoT"
     )
     cur = mydb.cursor()
 
@@ -68,7 +77,7 @@ def saveLoss(data):
         host = "localhost",
         user = "root",
         password = "123",
-        database="T2_IoT"
+        database="T1_IoT"
     )
     cur = mydb.cursor()
     cur.execute('''INSERT INTO Loss (MessageID, Delay, PacketLoss)  values (%s, %s, %s)''', data)
@@ -79,7 +88,7 @@ def getMessageID():
         host = "localhost",
         user = "root",
         password = "123",
-        database="T2_IoT"
+        database="T1_IoT"
     )
     cur = mydb.cursor()
     cur.execute(''' SELECT MessageId from Datos ORDER BY MessageId DESC LIMIT 1''')
@@ -95,7 +104,7 @@ def saveConfig(protocol, transport_layer):
         host = "localhost",
         user = "root",
         password = "123",
-        database="T2_IoT"
+        database="T1_IoT"
     )
     cur = mydb.cursor()
     cur.execute('''UPDATE Configuracion SET Protocol=%s, TransportLayer=%s''', (protocol, transport_layer))
@@ -107,7 +116,7 @@ def getConfig():
         host = "localhost",
         user = "root",
         password = "123",
-        database="T2_IoT"
+        database="T1_IoT"
     )
     cur = mydb.cursor()
     cur.execute(''' SELECT Protocol, TransportLayer from Configuracion''')

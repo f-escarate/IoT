@@ -4,7 +4,7 @@ mydb = mysql.connector.connect(
   host="localhost",
   user="root",
   password="123",
-  database="T2_IoT"
+  database="T1_IoT"
 )
 
 mycursor = mydb.cursor()
@@ -35,7 +35,10 @@ CreateDatos = '''CREATE TABLE Datos (
     AmpY FLOAT,
     FreqY FLOAT,
     AmpZ FLOAT,
-    FreqZ FLOAT
+    FreqZ FLOAT,
+    AccX JSON,
+    AccY JSON,
+    AccZ JSON
 );'''
 
 CreateLogs = '''CREATE TABLE Logs (

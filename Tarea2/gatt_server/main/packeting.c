@@ -1,15 +1,13 @@
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
-#include <protocols.c>
+#include "protocols.c"
 #include "esp_system.h"
 #include "esp_mac.h"
 #include "esp_log.h"
 
 
 static const char *TAG2 = "PACKETING";
-static const char *end_of_pkg = "~end~";
-static const char end_len = 5;
 
 
 //Genera el header de un mensaje, con la MAC, el protocolo, status, y el largo del mensaje.
@@ -37,7 +35,7 @@ char* header(char protocol, char transportLayer){
 }
 
 unsigned short messageLength(char protocol){
-    return 12+dataLength(protocol)+end_len;
+    return 12+dataLength(protocol);
 }
 
 char* mensaje (char protocol, char transportLayer){
@@ -71,7 +69,6 @@ char* mensaje (char protocol, char transportLayer){
 
 	memcpy((void*) mnsj, (void*) hdr, 12);										// Coping header
 	memcpy((void*) mnsj+12, (void*) data, dataLength(protocol));				// Coping data
-	memcpy((void*) mnsj+12+dataLength(protocol), (void*) end_of_pkg, end_len);	// Coping end of package
 	
 	free(hdr);
 	free(data);

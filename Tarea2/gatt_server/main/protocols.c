@@ -1,7 +1,7 @@
-#include <sensors.c>
 #include <stdlib.h>
 #include <string.h>
 #include "esp_log.h"
+#include "sensors.c"
 
 static const char *TAG8 = "PRotocols";
 

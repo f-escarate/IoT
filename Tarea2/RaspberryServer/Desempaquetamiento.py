@@ -33,6 +33,7 @@ def parseData(packet):
     data = packet[12:]
     header = headerDict(header)
     dataD = dataDict(header["protocol"], data)
+    print(dataD)
     
     if dataD is not None:
         if header["protocol"] == 5:
@@ -50,14 +51,13 @@ def parseData(packet):
             message_id = getMessageID()
             #print("---------aaaaaaaaaa ", message_id)
             loss_data = (message_id[0], deltaT, header['length'] - len(data))
-
             saveLoss(loss_data)
         
     return None if dataD is None else {**header, **dataD}
 
 # Ver https://docs.python.org/3/library/struct.html para más detalles
 def protUnpack(protocol:int, data):
-    protocol_unpack = ["<BBi", "<BBiBIBf","<BBiBIBff","<BBiBIBffffffff", "<i"]
+    protocol_unpack = ["<BBi", "<BBiBIBf","<BBiBIBff","<BBiBIBffffffff", "<BBiBIBf"+6000*"f", "<i"]
     """
     < :     little endian
     B :     unsigned char
@@ -70,11 +70,15 @@ def protUnpack(protocol:int, data):
     protocolo 1:    "<BBiBIBf"
     protocolo 2:    "<BBiBIBff"
     protocolo 3:    "<BBiBIBffffffff"
+    protocolo 4:    "<BBiBIBfff....ffff"
     protocolo_req:  "<BB"
     
     """
     
-    res = unpack(protocol_unpack[protocol], data)    
+    res = unpack(protocol_unpack[protocol], data)
+    if protocol == 4:
+        return res[:7] + tuple([list(res[7:2007])]) + tuple([list(res[2007:4007])]) + tuple([list(res[4007:6007])])
+    
     return res
 
 def headerDict(data):
@@ -83,7 +87,7 @@ def headerDict(data):
     return {"ID_device": ID_device, "MAC":MAC, "protocol":protocol, "status":status, "length":leng_msg}
 
 def dataDict(protocol:int, data):
-    if protocol not in [0, 1, 2, 3, 4]:
+    if protocol not in [0, 1, 2, 3, 4, 5]:
         print("Error: protocol doesnt exist")
         return None
     def protFunc(protocol, keys):
@@ -95,8 +99,9 @@ def dataDict(protocol:int, data):
     p1 = ["Val", "Batt_level", "Timestamp", "Temp", "Pres", "Hum", "Co"]
     p2 = ["Val", "Batt_level", "Timestamp", "Temp", "Pres", "Hum", "Co", "RMS"]
     p3 = ["Val", "Batt_level", "Timestamp", "Temp", "Pres", "Hum", "Co", "RMS", "AmpX", "FreqX", "AmpY", "FreqY", "AmpZ", "FreqZ"]
+    p4 = ["Val", "Batt_level", "Timestamp", "Temp", "Pres", "Hum", "Co", "AccX", "AccY", "AccZ"]
     p_req = ["Timestamp"]
-    p = [p0, p1, p2, p3, p_req]
+    p = [p0, p1, p2, p3, p4, p_req]
 
     try:
         return protFunc(protocol, p[protocol])(data)

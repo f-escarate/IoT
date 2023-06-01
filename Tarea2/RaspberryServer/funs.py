@@ -8,7 +8,7 @@ import time
 
 
 def select_options():
-    print("Select the protocol (0, 1, 2, 3) or 4 for close")
+    print("Select the protocol (0, 1, 2, 3, 4) or 5 for close")
     protocol = 0
     while True:
         if keyboard.is_pressed("0"):
@@ -28,6 +28,10 @@ def select_options():
             protocol = 3
             break
         elif keyboard.is_pressed("4"):
+            print(" -> You selected the protocol 4")
+            protocol = 4
+            break
+        elif keyboard.is_pressed("5"):
             return True
 
     transport_layer = 1 # TCP = 0 and UDP = 1
@@ -97,7 +101,7 @@ def connection(host, port):
             print('Data received: ', parsedData)
         
             # If the client, requested a protocol and transport_layer, we send it
-            if parsedData["protocol"] == 4:
+            if parsedData["protocol"] == 5:
                 change=True
             elif keyboard.is_pressed("c"):
                 # Is true when the user selects "close connection"
@@ -158,7 +162,15 @@ def recv_UDP(address, protocol):
             parsedData = parseData(data)
             
             # Print data
-            print('Data received: ', parsedData)
+            if parsedData["protocol"] != 4:
+                print('Data received: ', parsedData)
+            else:
+                printData = parsedData
+                printData["AccX"] = parsedData["AccX"][:3] + ["..."] + parsedData["AccX"][len(parsedData["AccX"])-4 : len(parsedData["AccX"])]
+                printData["AccY"] = parsedData["AccY"][:3] + ["..."] + parsedData["AccY"][len(parsedData["AccY"])-4 : len(parsedData["AccY"])]
+                printData["AccZ"] = parsedData["AccZ"][:3] + ["..."] + parsedData["AccZ"][len(parsedData["AccZ"])-4 : len(parsedData["AccZ"])]
+                print('Data received: ', printData)
+                
             # Check for protocol/transport_layer change
             if keyboard.is_pressed("c"):
                 # Is true when the user selects "close connection"
