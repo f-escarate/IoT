@@ -1,4 +1,5 @@
 #include "gatts_demo.c"
+#include "freertos/task.h"
 
 ///Declare the static function
 static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t *param);
@@ -21,7 +22,9 @@ uint8_t transport_layer = 10;
 char* SEND_MESSAGE;
 esp_gatt_rsp_t rsp;
 const int wakeup_time_sec = 60; // 60 seconds
-const float Discontinuous_time = 1;
+const float Discontinuous_time = 0.5;
+bool deepsleeping = false;
+TaskHandle_t deep_task_handle = NULL;
 
 void set_protocol_and_status(uint8_t prot, uint8_t status){
     protocol = prot;
@@ -32,12 +35,29 @@ void gen_message(){
     SEND_MESSAGE = mensaje(protocol, transport_layer);
 }
 
-void callback_deep_sleep(void* arg){
-    ESP_LOGE("aaa", "DEEPSLEEP");
-    esp_deep_sleep_start();
-}
+void deepsleep_task(void* arg){
+    esp_sleep_enable_timer_wakeup(wakeup_time_sec * 1000000);       // Deepsleep time
+    vTaskDelay(Discontinuous_time*60*1000 / portTICK_PERIOD_MS);    // Discontinuous_time delay
+    
+    uint16_t* args = (uint16_t*) arg;
+    uint8_t gatts_if = args[0];
+    uint16_t conn_id = args[1];
+    uint16_t char_handle = gl_profile_tab[PROFILE_A_APP_ID].char_handle;
+
+    ESP_LOGI("DEEPSLEEP", "Sending deepsleep notification");
+    uint8_t notify_data[5] = "close";
+    esp_ble_gatts_send_indicate(gatts_if, conn_id, char_handle, sizeof(notify_data), notify_data, false);
+
+    deepsleeping=true; // in order to lock the entering requests
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    ESP_LOGW("DEEPSLEEP", "Entering into deepsleep for %d seconds", wakeup_time_sec);
+    esp_deep_sleep_start(); 
+}   
 
 static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t *param) {
+    if(deepsleeping){
+        return;
+    }
     memset(&rsp, 0, sizeof(esp_gatt_rsp_t));
     switch (event) {
     case ESP_GATTS_REG_EVT:
@@ -109,26 +129,28 @@ static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
             // If the message is ok and is a change on the protocol, we update the variables
             if(ok){
                 if(change){
-                    if(param->write.value[2] == DISCONTINUOUS_STATUS){
-                        esp_sleep_enable_timer_wakeup(wakeup_time_sec * 1000000);
-                        esp_timer_handle_t timer;
-                        esp_timer_create_args_t timer_cfg = {
-                            .callback = &callback_deep_sleep,
-                        };
-                        esp_timer_create(&timer_cfg, &timer);
-                        esp_timer_start_once(timer, Discontinuous_time * 60 * 1000000);
+                    if(transport_layer != param->write.value[2]){
+                        if(param->write.value[2] == DISCONTINUOUS_STATUS){
+                            // Creating a task in order to `deepsleep` when `Discontinuous_time` passes
+                            uint16_t *args = malloc(2*sizeof(uint16_t));
+                            args[0] = gatts_if; args[1] = param->write.conn_id;
+                            xTaskCreate(deepsleep_task, "deep_task", 2048, args, 10, &deep_task_handle);
+                        }
+                        else if(param->write.value[2] == CONTINUOUS_STATUS){
+                            // Deleting the deepsleep task in order to prevent the sleep order
+                            if(deep_task_handle != NULL){
+                                vTaskDelete(deep_task_handle);
+                            }
+                        }
                     }
+                    ESP_LOGI(GATTS_TAG, "Cambio de msg %d, %d", protocol, transport_layer);
                     set_protocol_and_status(param->write.value[3], param->write.value[2]);
-                
-                ESP_LOGI(GATTS_TAG, "Cambio de msg %d, %d", protocol, transport_layer);
-                free(SEND_MESSAGE);
-                SEND_MESSAGE = mensaje(protocol, transport_layer);
-                }
-            }
-            else{
-                return;
-            }
 
+
+                }
+                free(SEND_MESSAGE);
+            }
+    
             if (gl_profile_tab[PROFILE_A_APP_ID].descr_handle == param->write.handle && param->write.len == 2){
                 uint16_t descr_value = param->write.value[1]<<8 | param->write.value[0];
                 if (descr_value == 0x0001){
@@ -203,6 +225,7 @@ static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
         ESP_LOGI(GATTS_TAG, "ADD_CHAR_EVT, status %d,  attr_handle %d, service_handle %d\n",
                 param->add_char.status, param->add_char.attr_handle, param->add_char.service_handle);
         gl_profile_tab[PROFILE_A_APP_ID].char_handle = param->add_char.attr_handle;
+        ESP_LOGI("Handle", "%x", param->add_char.attr_handle);
         gl_profile_tab[PROFILE_A_APP_ID].descr_uuid.len = ESP_UUID_LEN_16;
         gl_profile_tab[PROFILE_A_APP_ID].descr_uuid.uuid.uuid16 = ESP_GATT_UUID_CHAR_CLIENT_CONFIG;
         esp_err_t get_attr_ret = esp_ble_gatts_get_attr_value(param->add_char.attr_handle,  &length, &prf_char);
@@ -214,8 +237,11 @@ static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
         for(int i = 0; i < length; i++){
             ESP_LOGI(GATTS_TAG, "prf_char[%x] =%x\n",i,prf_char[i]);
         }
-        esp_err_t add_descr_ret = esp_ble_gatts_add_char_descr(gl_profile_tab[PROFILE_A_APP_ID].service_handle, &gl_profile_tab[PROFILE_A_APP_ID].descr_uuid,
-                                                                ESP_GATT_PERM_READ | ESP_GATT_PERM_WRITE, NULL, NULL);
+        esp_err_t add_descr_ret = esp_ble_gatts_add_char_descr(gl_profile_tab[PROFILE_A_APP_ID].service_handle,
+                                                            &gl_profile_tab[PROFILE_A_APP_ID].descr_uuid,
+                                                            ESP_GATT_PERM_READ | ESP_GATT_PERM_WRITE,
+                                                            NULL,
+                                                            NULL);
         if (add_descr_ret){
             ESP_LOGE(GATTS_TAG, "add char descr failed, error code =%x", add_descr_ret);
         }

@@ -55,6 +55,7 @@
 #define GATTS_DEMO_CHAR_VAL_LEN_MAX 0x40
 
 #define PREPARE_BUF_MAX_SIZE 1024
+#define CONTINUOUS_STATUS 30
 #define DISCONTINUOUS_STATUS 31
 
 static uint8_t char1_str[] = {0x11,0x22,0x33};
