@@ -1,0 +1,101 @@
+[1/11] Performing build step for 'bootloader'
+[1/1] cd /home/felipe/Desktop/Tareas/IoT/Tarea2/gatt_server/build/bootloader/esp-idf/esptool_py && /home/felipe/.espressif/python_env/idf5.1_py3.10_env/bin/python /home/felipe/esp/esp-idf/components/partition_table/check_sizes.py --offset 0x8000 bootloader 0x1000 /home/felipe/Desktop/Tareas/IoT/Tarea2/gatt_server/build/bootloader/bootloader.bin
+Bootloader binary size 0x6820 bytes. 0x7e0 bytes (7%) free.
+[2/9] Building C object esp-idf/main/CMakeFiles/__idf_main.dir/events.c.obj
+/home/felipe/Desktop/Tareas/IoT/Tarea2/gatt_server/main/events.c: In function 'gatts_profile_a_event_handler':
+/home/felipe/Desktop/Tareas/IoT/Tarea2/gatt_server/main/events.c:303:17: warning: unused variable 'transport_layer' [-Wunused-variable]
+  303 |         uint8_t transport_layer = 10;
+      |                 ^~~~~~~~~~~~~~~
+/home/felipe/Desktop/Tareas/IoT/Tarea2/gatt_server/main/events.c:302:17: warning: unused variable 'protocol' [-Wunused-variable]
+  302 |         uint8_t protocol = 5;
+      |                 ^~~~~~~~
+/home/felipe/Desktop/Tareas/IoT/Tarea2/gatt_server/main/events.c: At top level:
+/home/felipe/Desktop/Tareas/IoT/Tarea2/gatt_server/main/events.c:467:13: warning: 'gatts_event_handler' defined but not used [-Wunused-function]
+  467 | static void gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t *param)
+      |             ^~~~~~~~~~~~~~~~~~~
+In file included from /home/felipe/Desktop/Tareas/IoT/Tarea2/gatt_server/main/events.c:1:
+/home/felipe/Desktop/Tareas/IoT/Tarea2/gatt_server/main/gatts_demo.c:172:13: warning: 'gap_event_handler' defined but not used [-Wunused-function]
+  172 | static void gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t *param)
+      |             ^~~~~~~~~~~~~~~~~
+[3/9] Building C object esp-idf/main/CMakeFiles/__idf_main.dir/main.c.obj
+In file included from /home/felipe/Desktop/Tareas/IoT/Tarea2/gatt_server/main/main.c:1:
+/home/felipe/Desktop/Tareas/IoT/Tarea2/gatt_server/main/events.c: In function 'gatts_profile_a_event_handler':
+/home/felipe/Desktop/Tareas/IoT/Tarea2/gatt_server/main/events.c:303:17: warning: unused variable 'transport_layer' [-Wunused-variable]
+  303 |         uint8_t transport_layer = 10;
+      |                 ^~~~~~~~~~~~~~~
+/home/felipe/Desktop/Tareas/IoT/Tarea2/gatt_server/main/events.c:302:17: warning: unused variable 'protocol' [-Wunused-variable]
+  302 |         uint8_t protocol = 5;
+      |                 ^~~~~~~~
+[4/9] Linking C static library esp-idf/main/libmain.a
+[5/9] Generating ld/sections.ld
+[6/9] Linking CXX executable gatt_server_demos.elf
+[7/9] Generating binary image from built executable
+esptool.py v4.5.1
+Creating esp32 image...
+Merged 25 ELF sections
+Successfully created esp32 image.
+Generated /home/felipe/Desktop/Tareas/IoT/Tarea2/gatt_server/build/gatt_server_demos.bin
+[8/9] cd /home/felipe/Desktop/Tareas/IoT/Tarea2/gatt_server/build/esp-idf/esptool_py && /home/felipe/.espressif/python_env/idf5.1_py3.10_env/bin/python /home/felipe/esp/esp-idf/components/partition_table/check_sizes.py --offset 0x8000 partition --type app /home/felipe/Desktop/Tareas/IoT/Tarea2/gatt_server/build/partition_table/partition-table.bin /home/felipe/Desktop/Tareas/IoT/Tarea2/gatt_server/build/gatt_server_demos.bin
+gatt_server_demos.bin binary size 0xc07f0 bytes. Smallest app partition is 0x100000 bytes. 0x3f810 bytes (25%) free.
+[8/9] cd /home/felipe/esp/esp-idf/components/esptool_py && /usr/bin/cmake -D IDF_PATH=/home/felipe/esp/esp-idf -D "SERIAL_TOOL=/home/felipe/.espressif/python_env/idf5.1_py3.10_env/bin/python;;/home/felipe/esp/esp-idf/components/esptool_py/esptool/esptool.py;--chip;esp32" -D "SERIAL_TOOL_ARGS=--before=default_reset;--after=hard_reset;write_flash;@flash_args" -D WORKING_DIRECTORY=/home/felipe/Desktop/Tareas/IoT/Tarea2/gatt_server/build -P /home/felipe/esp/esp-idf/components/esptool_py/run_serial_tool.cmake
+esptool esp32 -p /dev/ttyUSB0 -b 460800 --before=default_reset --after=hard_reset write_flash --flash_mode dio --flash_freq 40m --flash_size 2MB 0x1000 bootloader/bootloader.bin 0x10000 gatt_server_demos.bin 0x8000 partition_table/partition-table.bin
+esptool.py v4.5.1
+Serial port /dev/ttyUSB0
+Connecting....
+Chip is ESP32-D0WDQ6 (revision v1.0)
+Features: WiFi, BT, Dual Core, 240MHz, VRef calibration in efuse, Coding Scheme None
+Crystal is 40MHz
+MAC: 3c:61:05:15:a4:00
+Uploading stub...
+Running stub...
+Stub running...
+Changing baud rate to 460800
+Changed.
+Configuring flash size...
+Flash will be erased from 0x00001000 to 0x00007fff...
+Flash will be erased from 0x00010000 to 0x000d0fff...
+Flash will be erased from 0x00008000 to 0x00008fff...
+Compressed 26656 bytes to 16683...
+Writing at 0x00001000... (50 %)
+Writing at 0x00007696... (100 %)
+Wrote 26656 bytes (16683 compressed) at 0x00001000 in 0.8 seconds (effective 272.2 kbit/s)...
+Hash of data verified.
+Compressed 788464 bytes to 467841...
+Writing at 0x00010000... (3 %)
+Writing at 0x0001ddfc... (6 %)
+Writing at 0x0002a87e... (10 %)
+Writing at 0x00036d18... (13 %)
+Writing at 0x0003c439... (17 %)
+Writing at 0x000425ec... (20 %)
+Writing at 0x00047d46... (24 %)
+Writing at 0x0004d9d2... (27 %)
+Writing at 0x00053073... (31 %)
+Writing at 0x0005875a... (34 %)
+Writing at 0x0005e277... (37 %)
+Writing at 0x00063a00... (41 %)
+Writing at 0x0006a054... (44 %)
+Writing at 0x0006ff18... (48 %)
+Writing at 0x00076098... (51 %)
+Writing at 0x0007bc3d... (55 %)
+Writing at 0x0008191e... (58 %)
+Writing at 0x00087824... (62 %)
+Writing at 0x0008d6ce... (65 %)
+Writing at 0x00093a3b... (68 %)
+Writing at 0x00099928... (72 %)
+Writing at 0x0009f357... (75 %)
+Writing at 0x000a4e62... (79 %)
+Writing at 0x000aa7bc... (82 %)
+Writing at 0x000b3447... (86 %)
+Writing at 0x000b9b50... (89 %)
+Writing at 0x000c1628... (93 %)
+Writing at 0x000c73da... (96 %)
+Writing at 0x000cd1fd... (100 %)
+Wrote 788464 bytes (467841 compressed) at 0x00010000 in 10.6 seconds (effective 592.6 kbit/s)...
+Hash of data verified.
+Compressed 3072 bytes to 103...
+Writing at 0x00008000... (100 %)
+Wrote 3072 bytes (103 compressed) at 0x00008000 in 0.1 seconds (effective 389.8 kbit/s)...
+Hash of data verified.
+
+Leaving...
+Hard resetting via RTS pin...

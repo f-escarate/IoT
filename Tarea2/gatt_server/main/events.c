@@ -131,63 +131,38 @@ static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
                 if(change){
                     if(transport_layer != param->write.value[2]){
                         if(param->write.value[2] == DISCONTINUOUS_STATUS){
+                            ESP_LOGI(GATTS_TAG, "=== Going to discontinuous mode ===");
                             // Creating a task in order to `deepsleep` when `Discontinuous_time` passes
                             uint16_t *args = malloc(2*sizeof(uint16_t));
                             args[0] = gatts_if; args[1] = param->write.conn_id;
                             xTaskCreate(deepsleep_task, "deep_task", 2048, args, 10, &deep_task_handle);
                         }
                         else if(param->write.value[2] == CONTINUOUS_STATUS){
+                            ESP_LOGI(GATTS_TAG, "=== Going to continuous mode ===");
                             // Deleting the deepsleep task in order to prevent the sleep order
                             if(deep_task_handle != NULL){
                                 vTaskDelete(deep_task_handle);
+                                deep_task_handle = NULL;
                             }
                         }
+                        else if(param->write.value[2] == CONFIGURATION_STATUS){
+                            ESP_LOGI(GATTS_TAG, "=== Going to configuration mode (Disconnecting) ===");
+                            if(deep_task_handle != NULL){
+                                vTaskDelete(deep_task_handle);
+                                deep_task_handle = NULL;
+                            }
+                            set_protocol_and_status(param->write.value[3], param->write.value[2]);
+                            write_need_rsp_handle(gatts_if, &a_prepare_write_env, param);
+                            return;
+                        }
                     }
-                    ESP_LOGI(GATTS_TAG, "Cambio de msg %d, %d", protocol, transport_layer);
                     set_protocol_and_status(param->write.value[3], param->write.value[2]);
-
-
+                    ESP_LOGI(GATTS_TAG, "Protocol/status changed: %d/%d", protocol, transport_layer);
                 }
                 free(SEND_MESSAGE);
             }
-    
-            if (gl_profile_tab[PROFILE_A_APP_ID].descr_handle == param->write.handle && param->write.len == 2){
-                uint16_t descr_value = param->write.value[1]<<8 | param->write.value[0];
-                if (descr_value == 0x0001){
-                    if (a_property & ESP_GATT_CHAR_PROP_BIT_NOTIFY){
-                        ESP_LOGI(GATTS_TAG, "notify enable");
-                        uint8_t notify_data[15];
-                        for (int i = 0; i < sizeof(notify_data); ++i)
-                        {
-                            notify_data[i] = i%0xff;
-                        }
-                        //the size of notify_data[] need less than MTU size
-                        esp_ble_gatts_send_indicate(gatts_if, param->write.conn_id, gl_profile_tab[PROFILE_A_APP_ID].char_handle,
-                                                sizeof(notify_data), notify_data, false);
-                    }
-                }else if (descr_value == 0x0002){
-                    if (a_property & ESP_GATT_CHAR_PROP_BIT_INDICATE){
-                        ESP_LOGI(GATTS_TAG, "indicate enable");
-                        uint8_t indicate_data[15];
-                        for (int i = 0; i < sizeof(indicate_data); ++i)
-                        {
-                            indicate_data[i] = i%0xff;
-                        }
-                        //the size of indicate_data[] need less than MTU size
-                        esp_ble_gatts_send_indicate(gatts_if, param->write.conn_id, gl_profile_tab[PROFILE_A_APP_ID].char_handle,
-                                                sizeof(indicate_data), indicate_data, true);
-                    }
-                }
-                else if (descr_value == 0x0000){
-                    ESP_LOGI(GATTS_TAG, "notify/indicate disable ");
-                }else{
-                    ESP_LOGE(GATTS_TAG, "unknown descr value");
-                    esp_log_buffer_hex(GATTS_TAG, param->write.value, param->write.len);
-                }
-
-            }
         }
-        example_write_event_env(gatts_if, &a_prepare_write_env, param);
+        write_need_rsp_handle(gatts_if, &a_prepare_write_env, param);
         break;
     }
     case ESP_GATTS_EXEC_WRITE_EVT:
@@ -279,9 +254,6 @@ static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
     }
     case ESP_GATTS_DISCONNECT_EVT:
         ESP_LOGI(GATTS_TAG, "ESP_GATTS_DISCONNECT_EVT, disconnect reason 0x%x", param->disconnect.reason);
-        ESP_LOGI(GATTS_TAG, "Going to CONFIGURATION MODE");
-        uint8_t protocol = 5;
-        uint8_t transport_layer = 10;
         esp_ble_gap_start_advertising(&adv_params);
         break;
     case ESP_GATTS_CONF_EVT:
@@ -366,7 +338,7 @@ static void gatts_profile_b_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
 
             }
         }
-        example_write_event_env(gatts_if, &b_prepare_write_env, param);
+        write_need_rsp_handle(gatts_if, &b_prepare_write_env, param);
         break;
     }
     case ESP_GATTS_EXEC_WRITE_EVT:

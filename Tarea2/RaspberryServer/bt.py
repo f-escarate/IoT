@@ -63,6 +63,16 @@ class GattConnector:
 		self.requester.write_by_handle(0x2a, data)
 		
 
+def req_and_write(obj: GattConnector, change, transport_layer, protocol):
+	global sleeping
+	try:
+		data = obj.request_data()
+		resp = response(change=change, status=transport_layer, protocol=protocol)
+		obj.write_data(resp)
+	except Exception as e:
+		if not sleeping:
+			print(e)
+
 
 def run():
 	global sleeping
@@ -80,20 +90,17 @@ def run():
 			if keyboard.is_pressed("c"):
 				# Is true when the user selects "close connection"
 				if select_options():
+					resp = response(change=True, status=10, protocol=5)
+					obj.write_data(resp)
 					return False
 				protocol, transport_layer = getConfig()
 				change = True
 			else:
 				change = False
 
-			
-			try:
-				data = obj.request_data()
-				resp = response(change=change, status=transport_layer, protocol=protocol)
-				obj.write_data(resp)
-			except Exception as e:
-				print(e)
-		print("Done.")
+			req_and_write(obj, change, transport_layer, protocol)
+				
+		print("Disconnected.\n\n")
 		return True
 	
 
