@@ -11,7 +11,7 @@ import keyboard
 
 from gattlib import GATTRequester, BTIOException
 from Desempaquetamiento import parseData, response
-from DatabaseWork import getConfig
+from DatabaseWork import getConfig, saveBLELoss
 from bt_funs import select_options
 
 sleeping = False
@@ -44,20 +44,26 @@ class GattConnector:
 	def connect(self, MAC):
 		print(f"Trying to connect to {MAC}")
 		connected = False
+		num_attempts = 0
+		t0 = time.time()
 		while not connected:
+			num_attempts += 1
 			try:
 				self.requester.connect(True)
 				connected = True
-			except BTIOException as e:
+			except BTIOException:
 				print("Failed to connect... restarting in 10 seconds")
 				time.sleep(10)
+
+		dt = time.time() - t0
+		saveBLELoss(dt, num_attempts)
 
 		print("Connection successful.")
 
 	def request_data(self):
 		data = self.requester.read_by_handle(0x2a)[0]
 		#data = self.requester.read_by_uuid("0000ff01-0000-1000-8000-00805f9b34fb")[0]
-		return parseData(data)
+		return parseData(data, use_ble = True)
 	
 	def write_data(self, data):
 		self.requester.write_by_handle(0x2a, data)
@@ -78,7 +84,9 @@ def run():
 	global sleeping
 	sleeping = False
 	MAC = '3c:61:05:15:a4:02'
+	# Connecting to MAC
 	obj = GattConnector(MAC)
+
 	data = obj.request_data()
 	
 	change = True

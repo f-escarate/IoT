@@ -25,7 +25,7 @@ def response(change:bool=False, status:int=255, protocol:int=255):
     CHANGE = 1 if change else 0
     return pack("<BBBB", OK, CHANGE, status, protocol)
 
-def parseData(packet):
+def parseData(packet, use_ble=False):
     global begin_time
     global esp_time
     
@@ -33,25 +33,22 @@ def parseData(packet):
     data = packet[12:]
     header = headerDict(header)
     dataD = dataDict(header["protocol"], data)
-    print(dataD)
+    print("datos:", dataD)
     
     if dataD is not None:
         if header["protocol"] == 5:
             begin_time = round(time.time()*1000)
             esp_time = dataD['Timestamp']
             saveLog(header, dataD)
-            #print("primer tiempo ", dataD['Timestamp'])
         else:
             current_time = round(time.time()*1000)
             dataD['Timestamp'] = begin_time+(dataD['Timestamp']-esp_time)
             deltaT = current_time - dataD['Timestamp']
-            #print("---Timestamp: ", dataD['Timestamp'])
-            #print("....DELTAT ", deltaT)
             dataSave(header, dataD)
             message_id = getMessageID()
-            #print("---------aaaaaaaaaa ", message_id)
-            loss_data = (message_id[0], deltaT, header['length'] - len(data))
-            saveLoss(loss_data)
+            if not use_ble:
+                loss_data = (message_id[0], deltaT, header['length'] - len(data))
+                saveLoss(loss_data)
         
     return None if dataD is None else {**header, **dataD}
 

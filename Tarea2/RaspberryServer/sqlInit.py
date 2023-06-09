@@ -61,12 +61,21 @@ CreateLoss = '''CREATE TABLE Loss (
     FOREIGN KEY (MessageId) REFERENCES Datos(MessageId)
 );'''
 
+CreateBLELoss = '''CREATE TABLE BLELoss (
+    Delay FLOAT,
+    Attempts INTEGER
+);'''
+
 mycursor.execute("DROP TABLE Logs")
 mycursor.execute("DROP TABLE Loss")
 mycursor.execute("DROP TABLE Configuracion")
 mycursor.execute("DROP TABLE Datos")
+mycursor.execute("DROP TABLE BLELoss")
 
 mycursor.execute(CreateDatos)
 mycursor.execute(CreateLogs)
 mycursor.execute(CreateConfiguracion)
 mycursor.execute(CreateLoss)
+mycursor.execute(CreateBLELoss)
+mycursor.execute('INSERT INTO Configuracion (Protocol, TransportLayer)  values (0, 0)')
+mydb.commit()

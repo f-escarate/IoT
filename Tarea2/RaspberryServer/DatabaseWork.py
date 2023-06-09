@@ -83,6 +83,17 @@ def saveLoss(data):
     cur.execute('''INSERT INTO Loss (MessageID, Delay, PacketLoss)  values (%s, %s, %s)''', data)
     mydb.commit()
 
+def saveBLELoss(delay, attempts):
+    mydb = mysql.connector.connect(
+        host = "localhost",
+        user = "root",
+        password = "123",
+        database="T1_IoT"
+    )
+    cur = mydb.cursor()
+    cur.execute('''INSERT INTO BLELoss (Delay, Attempts)  values (%s, %s)''', (delay, attempts))
+    mydb.commit()
+
 def getMessageID():
     mydb = mysql.connector.connect(
         host = "localhost",
