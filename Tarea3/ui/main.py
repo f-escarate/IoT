@@ -1,6 +1,7 @@
 from iot import Ui_Dialog
 from PyQt5 import QtCore, QtGui, QtWidgets
 import plot as pl
+from RaspberryServer.TCPRaspServer import connect
 
 class Controller:
     
@@ -82,6 +83,9 @@ if __name__ == "__main__":
 
     cont.init_plots()
     cont.setSignals()
+
+    connect()
     
     sys.exit(app.exec_())
+
 
