@@ -5,6 +5,7 @@ from .Desempaquetamiento import parseData, response, end_response
 from .DatabaseWork import saveConfig, getConfig
 import sys, select
 import time
+ 
 
 
 def select_options():
@@ -57,7 +58,8 @@ def select_timeout():
             return select_options()
     return None
     
-def connection(host, port):
+def connection(host, port,worker,conf):
+
     s = socket.socket(socket.AF_INET, #internet
                   socket.SOCK_STREAM) #TCP
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -99,7 +101,15 @@ def connection(host, port):
                 break
             parsedData = parseData(data)
             print('Data received: ', parsedData)
-        
+            
+            if parsedData != None:
+                parsedData
+               
+          
+            worker.do_work(parsedData)
+              
+           
+               
             # If the client, requested a protocol and transport_layer, we send it
             if parsedData["protocol"] == 5:
                 change=True

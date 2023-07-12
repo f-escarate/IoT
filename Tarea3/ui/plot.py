@@ -41,3 +41,16 @@ class RealTimePlot(pg.PlotWidget):
             
         self.clear()
         self.plot(self.data_array[0], self.data_array[1])
+        
+        
+    def set_data(self,x,data):
+        
+        self.data_array[1] = data
+        self.data_array[0] = x
+
+        if len(self.data_array[1])>self.max_size:
+            del self.data_array[1][0]
+            del self.data_array[0][0]
+            
+        self.clear()
+        self.plot(self.data_array[0], self.data_array[1])
