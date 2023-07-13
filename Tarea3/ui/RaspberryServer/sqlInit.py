@@ -49,8 +49,18 @@ CreateLogs = '''CREATE TABLE Logs (
 );'''
 
 CreateConfiguracion = '''CREATE TABLE Configuracion (
+    TransportLayer INTEGER NOT NULL,
     Protocol INTEGER NOT NULL,
-    TransportLayer INTEGER NOT NULL
+    Asc_sampling INTEGER,
+    Asc_sensibility INTEGER,
+    Gyro_sensibility INTEGER,
+    BME688_sampling INTEGER,
+    Discontinous_time INTEGER,
+    TCP_PORT INTEGER,
+    UDP_PORT INTEGER,
+    Host_ip_addr INTEGER,
+    SSID VARCHAR(45),
+    Pass VARCHAR(45)
 );'''
 
 CreateLoss = '''CREATE TABLE Loss (

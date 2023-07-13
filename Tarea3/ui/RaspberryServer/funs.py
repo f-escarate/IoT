@@ -59,7 +59,8 @@ def select_timeout():
     return None
     
 def connection(host, port,worker,conf):
-
+    
+    saveConfig(conf["Protocol"],conf["TransportLayer"])
     s = socket.socket(socket.AF_INET, #internet
                   socket.SOCK_STREAM) #TCP
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -136,7 +137,7 @@ def connection(host, port,worker,conf):
                 print("-------------TO UDP----------------")
                 conn.close()
                 # Is true when the user selects "close connection"
-                if recv_UDP((host, port), protocol):
+                if recv_UDP((host, port), protocol,worker):
                     print("Closing Connection")
                     return
                 print("-------------TO TCP----------------")
@@ -150,10 +151,11 @@ def connection(host, port,worker,conf):
                     break
                 continue
 
+        
         conn.close()
         print('Disconnected')
 
-def recv_UDP(address, protocol):
+def recv_UDP(address, protocol,worker):
     s = socket.socket(socket.AF_INET, #internet
                   socket.SOCK_DGRAM) #UDP
     s.bind(address)
@@ -170,7 +172,7 @@ def recv_UDP(address, protocol):
             except:
                 break
             parsedData = parseData(data)
-            
+            worker.do_work(parsedData)
             # Print data
             if parsedData["protocol"] != 4:
                 print('Data received: ', parsedData)

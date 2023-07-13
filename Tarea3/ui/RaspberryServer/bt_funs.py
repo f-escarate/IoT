@@ -2,7 +2,7 @@ import keyboard
 import socket
 import sys, select
 import time
-from Desempaquetamiento import saveConfig
+from .Desempaquetamiento import saveConfig
 
 def select_options():
     print("Select the protocol (0, 1, 2, 3) or 5 for close")

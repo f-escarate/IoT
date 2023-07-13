@@ -121,6 +121,16 @@ def saveConfig(protocol, transport_layer):
     cur.execute('''UPDATE Configuracion SET Protocol=%s, TransportLayer=%s''', (protocol, transport_layer))
     mydb.commit()
 
+def saveConfig2(config):
+    mydb = mysql.connector.connect(
+        host = "localhost",
+        user = "root",
+        password = "123",
+        database="T1_IoT"
+    )
+    cur = mydb.cursor()
+    cur.execute('''UPDATE Configuracion SET TransportLayer=%s, Protocol=%s ,Asc_sampling=%s, Asc_sensibility=%s, Gyro_sensibility=%s, BME688_sampling=%s, Discontinous_time=%s, TCP_PORT=%s, UDP_PORT=%s, Host_ip_addr=%s, SSID=%s, Pass=%s''', tuple(config.values()))
+    mydb.commit()
 
 def getConfig():
     mydb = mysql.connector.connect(

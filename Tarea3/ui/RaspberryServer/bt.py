@@ -9,25 +9,33 @@ import time
 import subprocess
 import keyboard
 
+from .TCPRaspServer import connect
 from gattlib import GATTRequester, BTIOException
-from Desempaquetamiento import parseData, response
-from DatabaseWork import getConfig, saveBLELoss
-from bt_funs import select_options
+from .Desempaquetamiento import parseData, response
+from .DatabaseWork import getConfig, saveBLELoss
+from .bt_funs import select_options
 
 sleeping = False
+wifi = False
 
 class Requester(GATTRequester):
 	def __init__(self, *args):
 		GATTRequester.__init__(self, *args)
 		self.sleep_msg = "close".encode()
+		self.wifi_msg = "towifi".encode()
 
 	def on_notification(self, handle, data):
 		global sleeping
+		global wifi
 		print("Notification received from handle:", hex(handle))
 		if data[3:] == self.sleep_msg and (not sleeping):
 			print("ESP32 sleeping")
 			sleeping = True
-
+			
+		if data[3:] == self.wifi_msg:
+			print("ESP32 ->>> to wifi")
+			wifi = True
+			
 	def on_indication(self, handle, data):
 		global sleeping
 		print("Indication received from handle:",hex(handle))
@@ -82,7 +90,9 @@ def req_and_write(obj: GattConnector, change, transport_layer, protocol):
 
 def run():
 	global sleeping
+	global wifi
 	sleeping = False
+	wifi = False
 	MAC = '3c:61:05:15:a4:02'
 	# Connecting to MAC
 	obj = GattConnector(MAC)
@@ -94,7 +104,7 @@ def run():
 		protocol, transport_layer = getConfig()
 		resp = response(change=change, status=transport_layer, protocol=protocol)
 		obj.write_data(resp)
-		while(not sleeping):
+		while(not sleeping and not wifi):
 			if keyboard.is_pressed("c"):
 				# Is true when the user selects "close connection"
 				if select_options():
@@ -112,11 +122,18 @@ def run():
 		return True
 	
 
-if __name__ == "__main__":
+def connect_bt(worker,conf):
+	global wifi
 	# Apaga el wlan porque comparte la antena con bt
 	subprocess.run(["sudo", "ip", "link", "set", "wlan0", "down"])
 	select_options()
 	while run():
 		pass
+		
+	print("webos")
 	# Se vuelve a encender el WLAN
 	subprocess.run(["sudo", "ip", "link", "set", "wlan0", "up"])
+	if wifi:
+		connect(worker,conf)
+		
+		

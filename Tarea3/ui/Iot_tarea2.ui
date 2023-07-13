@@ -637,7 +637,17 @@ color: rgb(255, 255, 255);</string>
      </item>
      <item>
       <property name="text">
+       <string>Presion</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
        <string>Humedad</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>CO</string>
       </property>
      </item>
      <item>
@@ -658,6 +668,36 @@ color: rgb(255, 255, 255);</string>
      <item>
       <property name="text">
        <string>RMS</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Freq_x</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Freq_y</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Freq_z</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Rgy_x</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Rgy_y</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Rgy_z</string>
       </property>
      </item>
     </widget>
@@ -706,7 +746,17 @@ color: rgb(255, 255, 255);</string>
      </item>
      <item>
       <property name="text">
+       <string>Presion</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
        <string>Humedad</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>CO</string>
       </property>
      </item>
      <item>
@@ -727,6 +777,36 @@ color: rgb(255, 255, 255);</string>
      <item>
       <property name="text">
        <string>RMS</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Freq_x</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Freq_y</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Freq_z</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Rgy_x</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Rgy_y</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Rgy_z</string>
       </property>
      </item>
     </widget>
@@ -749,7 +829,17 @@ color: rgb(255, 255, 255);</string>
      </item>
      <item>
       <property name="text">
+       <string>Presion</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
        <string>Humedad</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>CO</string>
       </property>
      </item>
      <item>
@@ -770,6 +860,36 @@ color: rgb(255, 255, 255);</string>
      <item>
       <property name="text">
        <string>RMS</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Freq_x</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Freq_y</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Freq_z</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Rgy_x</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Rgy_y</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Rgy_z</string>
       </property>
      </item>
     </widget>
